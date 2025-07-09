@@ -1,71 +1,43 @@
-import { useEffect, useState } from 'react'
-import { fetchMindshare } from '../api/kaito'
+import { useEffect, useState } from 'react';
+import { fetchYaps } from '../api/kaito';
 
 interface Props {
-  topic: string
+  username: string;
 }
 
-interface Data {
-  mindshare: number
-  trend: string
+interface YapStats {
+  yaps_all?: number;
+  yaps_124h?: number;
+  yaps_16m?: number;
+  [key: string]: any;
 }
 
-export default function FlexCard({ topic }: Props) {
-  const [data, setData] = useState<Data | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+export default function FlexCard({ username }: Props) {
+  const [stats, setStats] = useState<YapStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let mounted = true
-    let timer: number | undefined
-
-    async function load() {
-      setLoading(true)
-      setError(null)
-      try {
-        const res = await fetchMindshare(topic)
-        if (mounted) {
-          setData(res)
-        }
-      } catch (err) {
-        if (mounted) {
-          setError((err as Error).message)
-        }
-      } finally {
-        if (mounted) setLoading(false)
-      }
-    }
-
-    load()
-    timer = window.setInterval(load, 60_000)
-
-    return () => {
-      mounted = false
-      if (timer) clearInterval(timer)
-    }
-  }, [topic])
+    setLoading(true);
+    setError(null);
+    fetchYaps(username)
+      .then(setStats)
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, [username]);
 
   return (
-    <div
-      className="rounded-xl bg-white/10 backdrop-blur-md p-4 transition-transform transform hover:scale-105 hover:shadow-xl"
-    >
+    <div className="rounded-xl bg-white/10 ring-1 ring-white/20 backdrop-blur-md p-4 transition-transform hover:scale-105">
+      <h2 className="text-lg font-semibold mb-2">{username}</h2>
       {loading && <p>Loading...</p>}
       {error && <p className="text-red-500">{error}</p>}
-      {!loading && !error && data && (
-        <>
-          <h2 className="text-lg font-semibold mb-2">{topic}</h2>
-          <p className="mb-1">Mindshare: <span className="font-bold">{data.mindshare}</span></p>
-          <p className="mb-2">Trend: <span className="capitalize">{data.trend}</span></p>
-          <a
-            href={`https://kaito.ai/search?q=${encodeURIComponent(topic)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-400 underline"
-          >
-            View on Kaito
-          </a>
-        </>
+      {!loading && !error && stats && (
+        <ul className="space-y-1 text-sm text-gray-200">
+          <li>All: {stats.yaps_all ?? 'N/A'}</li>
+          <li>24h: {stats.yaps_124h ?? 'N/A'}</li>
+          <li>16m: {stats.yaps_16m ?? 'N/A'}</li>
+        </ul>
       )}
     </div>
-  )
+  );
 }

@@ -1,6 +1,6 @@
-import Home from './Home'
-import './index.css'
+import Home from './Home';
+import './index.css';
 
 export default function App() {
-  return <Home />
+  return <Home />;
 }
