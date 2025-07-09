@@ -49,7 +49,11 @@ export default function FlexCard({ topic }: Props) {
     <div
       className="rounded-xl bg-white/10 backdrop-blur-md p-4 transition-transform transform hover:scale-105 hover:shadow-xl"
     >
-      {loading && <p>Loading...</p>}
+      {loading && (
+        <div className="flex items-center justify-center h-24">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+        </div>
+      )}
       {error && <p className="text-red-500">{error}</p>}
       {!loading && !error && data && (
         <>

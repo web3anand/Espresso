@@ -20,7 +20,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col font-sans text-white bg-gradient-to-br from-zinc-900 to-zinc-800">
       <header className="p-6 text-center">
         <h1 className="text-3xl font-bold">Espresso Flex Cards</h1>
-        <p className="text-gray-400">Crypto mindshare at a glance</p>
+        <p className="text-gray-400">Powered by Kaito</p>
       </header>
       <main className="flex-grow px-4 pb-8" id="main">
         <form onSubmit={addTopic} className="mb-6 flex justify-center">

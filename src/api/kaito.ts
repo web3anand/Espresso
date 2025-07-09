@@ -1,3 +1,4 @@
+// Base URL for all Kaito API requests
 const BASE_URL = 'https://api.kaito.ai/v1'
 
 interface MindshareData {
@@ -5,6 +6,10 @@ interface MindshareData {
   trend: 'positive' | 'neutral' | 'negative'
 }
 
+/**
+ * Fetch mindshare information for a given topic from Kaito.
+ * The API key is read from the VITE_KAITO_API_KEY environment variable.
+ */
 export async function fetchMindshare(topic: string): Promise<MindshareData> {
   const apiKey = import.meta.env.VITE_KAITO_API_KEY
   if (!apiKey) throw new Error('Missing KAITO API Key')
