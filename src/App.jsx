@@ -1,5 +1,5 @@
-import Home from './Home'
 import './index.css'
+import Home from './Home'
 
 export default function App() {
   return <Home />
