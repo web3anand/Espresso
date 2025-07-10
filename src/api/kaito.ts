@@ -6,7 +6,7 @@ export interface KaitoYapData {
   [key: string]: unknown;
 }
 
-export async function fetchUserYaps(username: string): Promise<KaitoYapData> {
+export async function fetchYaps(username: string): Promise<KaitoYapData> {
   const res = await fetch(
     `https://api.kaito.ai/api/v1/yaps?username=${encodeURIComponent(username)}`
   );

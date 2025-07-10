@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { fetchUserYaps, KaitoYapData } from './api/kaito'
+import { fetchYaps } from './api/kaito'
+import type { KaitoYapData } from './api/kaito'
 
 export default function App() {
   const [username, setUsername] = useState('')
@@ -15,7 +16,7 @@ export default function App() {
     setError('')
     setData(null)
     try {
-      const res = await fetchUserYaps(name)
+      const res = await fetchYaps(name)
       setData(res)
     } catch (err) {
       setError('User not found or request failed')
