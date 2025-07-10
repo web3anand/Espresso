@@ -1,34 +1,6 @@
 import { useState, type FormEvent } from 'react'
-// We will define fetchYaps inline for clarity, or you can update your ./api/kaito file.
-import FlexCard from './components/FlexCard'
-
-export interface KaitoYapData {
-  user_id: string;
-  username: string;
-  yaps_all: number;
-  yaps_l24h: number;
-  yaps_l48h: number;
-  yaps_l7d: number;
-  yaps_l30d: number;
-  yaps_l3m: number;
-  yaps_l6m: number;
-  [key: string]: unknown;
-}
-
-// Proxy endpoint: /api/yaps?username=...
-export async function fetchYaps(username: string): Promise<KaitoYapData> {
-  const res = await fetch(`/api/yaps?username=${encodeURIComponent(username.trim())}`);
-
-  const text = await res.text();
-  try {
-    if (!res.ok) {
-      throw new Error(text || 'Failed to fetch data');
-    }
-    return JSON.parse(text) as KaitoYapData;
-  } catch (err) {
-    throw new Error(text || 'Failed to fetch data');
-  }
-}
+import YapCard from './components/YapCard'
+import { fetchYaps, type KaitoYapData } from './api/kaito'
 
 export default function App() {
   const [username, setUsername] = useState('')
@@ -54,25 +26,33 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <div className="w-full max-w-md space-y-4">
-        <form onSubmit={handleSubmit} className="flex space-x-2">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-xl space-y-6 text-center">
+        <div className="space-y-2">
+          <h1 className="text-4xl font-bold font-sans">Espresso Yaps</h1>
+          <p className="text-gray-600 text-xl">Tokenized attention for X (Twitter) at a glance</p>
+        </div>
+        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-center gap-4">
           <input
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Enter X username"
-            className="flex-grow rounded border border-gray-300 px-3 py-2 focus:outline-none"
+            className="w-full rounded-lg border border-gray-300 px-4 py-2 text-lg focus:outline-none focus:ring focus:ring-blue-500"
           />
           <button
             type="submit"
-            className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+            className="rounded-lg bg-blue-600 px-6 py-2 font-bold text-white hover:bg-blue-700"
           >
-            Submit
+            Search
           </button>
         </form>
-        {loading && <p className="text-center">Loading...</p>}
-        {error && <p className="text-center text-red-500">{error}</p>}
-        {data && <FlexCard data={data} />}
+        {loading && (
+          <div className="flex justify-center">
+            <div className="h-6 w-6 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+          </div>
+        )}
+        {error && <p className="text-red-500">{error}</p>}
+        {data && <YapCard data={data} />}
       </div>
     </div>
   )
