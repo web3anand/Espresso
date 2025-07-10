@@ -54,14 +54,17 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <div className="w-full max-w-md space-y-4">
-        <form onSubmit={handleSubmit} className="flex space-x-2">
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="w-full max-w-xl space-y-4 rounded-xl bg-white/30 backdrop-blur-md p-6 shadow-lg">
+        <form
+          onSubmit={handleSubmit}
+          className="mx-auto flex w-full max-w-md flex-col items-center justify-center space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2"
+        >
           <input
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Enter X username"
-            className="flex-grow rounded border border-gray-300 px-3 py-2 focus:outline-none"
+            className="flex-grow rounded border border-gray-300 bg-white/80 px-3 py-2 focus:outline-none"
           />
           <button
             type="submit"
