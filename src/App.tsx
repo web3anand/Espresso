@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, type FormEvent } from 'react'
 import { fetchYaps } from './api/kaito'
 import type { KaitoYapData } from './api/kaito'
+import FlexCard from './components/FlexCard'
 
 export default function App() {
   const [username, setUsername] = useState('')
@@ -8,7 +9,7 @@ export default function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const name = username.trim()
     if (!name) return
@@ -44,20 +45,7 @@ export default function App() {
         </form>
         {loading && <p className="text-center">Loading...</p>}
         {error && <p className="text-center text-red-500">{error}</p>}
-        {data && (
-          <pre className="whitespace-pre-wrap rounded bg-gray-800 p-4 text-sm text-white">
-{JSON.stringify(
-  {
-    username: data.username,
-    yaps_all: data.yaps_all,
-    yaps_124h: data.yaps_124h,
-    yaps_16m: data.yaps_16m,
-  },
-  null,
-  2
-)}
-          </pre>
-        )}
+        {data && <FlexCard data={data} />}
       </div>
     </div>
   )
