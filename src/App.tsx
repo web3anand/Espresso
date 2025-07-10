@@ -50,8 +50,12 @@ export default function App() {
             <h2 className="mb-2 text-lg font-semibold">{data.username}</h2>
             <ul className="space-y-1">
               <li>yaps_all: {data.yaps_all}</li>
-              <li>yaps_124h: {data.yaps_124h}</li>
-              <li>yaps_16m: {data.yaps_16m}</li>
+              <li>yaps_l24h: {data.yaps_l24h}</li>
+              <li>yaps_l48h: {data.yaps_l48h}</li>
+              <li>yaps_l7d: {data.yaps_l7d}</li>
+              <li>yaps_l30d: {data.yaps_l30d}</li>
+              <li>yaps_l3m: {data.yaps_l3m}</li>
+              <li>yaps_l6m: {data.yaps_l6m}</li>
             </ul>
           </div>
         )}
