@@ -1,4 +1,4 @@
-import type { KaitoYapData } from '../api/kaito'
+import type { KaitoYapData } from '../../api/kaito'
 
 export default function FlexCard({ data }: { data: KaitoYapData }) {
   return (
