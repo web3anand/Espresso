@@ -1,7 +1,34 @@
 import { useState, type FormEvent } from 'react'
-import { fetchYaps } from './api/kaito'
-import type { KaitoYapData } from './api/kaito'
+// We will define fetchYaps inline for clarity, or you can update your ./api/kaito file.
 import FlexCard from './components/FlexCard'
+
+export interface KaitoYapData {
+  user_id: string;
+  username: string;
+  yaps_all: number;
+  yaps_l24h: number;
+  yaps_l48h: number;
+  yaps_l7d: number;
+  yaps_l30d: number;
+  yaps_l3m: number;
+  yaps_l6m: number;
+  [key: string]: unknown;
+}
+
+// Proxy endpoint: /api/yaps?username=...
+export async function fetchYaps(username: string): Promise<KaitoYapData> {
+  const res = await fetch(`/api/yaps?username=${encodeURIComponent(username.trim())}`);
+
+  const text = await res.text();
+  try {
+    if (!res.ok) {
+      throw new Error(text || 'Failed to fetch data');
+    }
+    return JSON.parse(text) as KaitoYapData;
+  } catch (err) {
+    throw new Error(text || 'Failed to fetch data');
+  }
+}
 
 export default function App() {
   const [username, setUsername] = useState('')
@@ -19,8 +46,8 @@ export default function App() {
     try {
       const res = await fetchYaps(name)
       setData(res)
-    } catch (err) {
-      setError('User not found or request failed')
+    } catch (err: any) {
+      setError(err.message || 'User not found or request failed')
     } finally {
       setLoading(false)
     }

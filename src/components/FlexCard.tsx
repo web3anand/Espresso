@@ -1,7 +1,8 @@
 import type { KaitoYapData } from '../api/kaito'
+
 export default function FlexCard({ data }: { data: KaitoYapData }) {
   return (
-    <div className="rounded-xl border bg-white shadow p-4">
+    <div className="rounded-xl border bg-white shadow p-4 space-y-2">
       <p>
         <span className="font-semibold">Username:</span> {data.username}
       </p>
@@ -27,5 +28,5 @@ export default function FlexCard({ data }: { data: KaitoYapData }) {
         <span className="font-semibold">Yaps 6m:</span> {data.yaps_l6m}
       </p>
     </div>
-  );
+  )
 }
