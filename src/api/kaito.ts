@@ -7,13 +7,10 @@ export interface KaitoYapData {
 }
 
 export async function fetchYaps(username: string): Promise<KaitoYapData> {
-  const res = await fetch(
-    `https://api.kaito.ai/api/v1/yaps?username=${encodeURIComponent(username)}`
-  );
-
+  const url = `https://api.kaito.ai/api/v1/yaps?username=${encodeURIComponent(username.trim())}`;
+  const res = await fetch(url);
   if (!res.ok) {
     throw new Error('Failed to fetch data');
   }
-
   return (await res.json()) as KaitoYapData;
 }
