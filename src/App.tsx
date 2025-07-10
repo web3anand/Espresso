@@ -58,13 +58,13 @@ export default function App() {
       <div className="w-full max-w-xl space-y-4 rounded-xl bg-white/30 backdrop-blur-md p-6 shadow-lg">
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col items-center space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2"
+          className="mx-auto flex w-full max-w-md flex-col items-center justify-center space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2"
         >
           <input
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Enter X username"
-            className="w-full max-w-sm flex-grow rounded border border-gray-300 bg-white/80 px-3 py-2 focus:outline-none"
+            className="flex-grow rounded border border-gray-300 bg-white/80 px-3 py-2 focus:outline-none"
           />
           <button
             type="submit"
