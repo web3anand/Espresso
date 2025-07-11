@@ -1,19 +1,11 @@
 import { useState, type FormEvent } from 'react'
-// We will define fetchYaps inline for clarity, or you can update your ./api/kaito file.
-import FlexCard from './components/FlexCard'
+import Navbar from './components/Navbar'
+import Hero from './components/Hero'
+import DashboardLayout from './components/DashboardLayout'
+import InsightsModal from './components/InsightsModal'
+import Footer from './components/Footer'
+import type { KaitoYapData } from './types'
 
-export interface KaitoYapData {
-  user_id: string;
-  username: string;
-  yaps_all: number;
-  yaps_l24h: number;
-  yaps_l48h: number;
-  yaps_l7d: number;
-  yaps_l30d: number;
-  yaps_l3m: number;
-  yaps_l6m: number;
-  [key: string]: unknown;
-}
 
 // Proxy endpoint: /api/yaps?username=...
 export async function fetchYaps(username: string): Promise<KaitoYapData> {
@@ -35,6 +27,7 @@ export default function App() {
   const [data, setData] = useState<KaitoYapData | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [showInsights, setShowInsights] = useState(false)
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -54,26 +47,22 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <div className="w-full max-w-md space-y-4">
-        <form onSubmit={handleSubmit} className="flex space-x-2">
-          <input
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Enter X username"
-            className="flex-grow rounded border border-gray-300 px-3 py-2 focus:outline-none"
+    <div>
+      <Navbar />
+      <Hero username={username} onUsernameChange={setUsername} onSubmit={handleSubmit} />
+      {loading && <p className="text-center mt-4">Loading...</p>}
+      {error && <p className="text-center text-red-500 mt-4">{error}</p>}
+      {data && (
+        <>
+          <DashboardLayout data={data} onShowInsights={() => setShowInsights(true)} />
+          <InsightsModal
+            open={showInsights}
+            onClose={() => setShowInsights(false)}
+            points={[data.yaps_l24h, data.yaps_l7d, data.yaps_l30d, data.yaps_l6m]}
           />
-          <button
-            type="submit"
-            className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-          >
-            Submit
-          </button>
-        </form>
-        {loading && <p className="text-center">Loading...</p>}
-        {error && <p className="text-center text-red-500">{error}</p>}
-        {data && <FlexCard data={data} />}
-      </div>
+        </>
+      )}
+      <Footer />
     </div>
   )
 }
