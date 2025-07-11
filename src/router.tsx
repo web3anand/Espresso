@@ -3,9 +3,8 @@ import {
   useContext,
   useState,
   useEffect,
-  ReactNode,
-  ReactElement,
 } from 'react'
+import type { ReactNode, ReactElement } from 'react'
 
 interface RouterState {
   path: string
@@ -22,6 +21,11 @@ interface Params {
 }
 
 const ParamsContext = createContext<Params>({})
+
+export interface RouteProps {
+  path: string
+  element: ReactElement
+}
 
 function matchPath(pattern: string, path: string): Params | null {
   const pSeg = pattern.split('/').filter(Boolean)
@@ -58,15 +62,15 @@ export function BrowserRouter({ children }: { children: ReactNode }) {
   )
 }
 
-export function Routes({ children }: { children: ReactElement[] }) {
+export function Routes({ children }: { children: Array<ReactElement<RouteProps>> }) {
   const { path } = useContext(RouterContext)
   let element: ReactElement | null = null
   let params: Params = {}
   children.forEach((child) => {
-    if (!child) return
-    const match = matchPath(child.props.path, path)
+    const el = child as ReactElement<RouteProps>
+    const match = matchPath(el.props.path, path)
     if (match && !element) {
-      element = child.props.element
+      element = el.props.element
       params = match
     }
   })
@@ -75,7 +79,7 @@ export function Routes({ children }: { children: ReactElement[] }) {
   ) : null
 }
 
-export function Route({}: { path: string; element: ReactElement }) {
+export function Route(_: RouteProps) {
   return null
 }
 
