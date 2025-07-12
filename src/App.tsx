@@ -1,79 +1,64 @@
-import { useState, type FormEvent } from 'react'
-// We will define fetchYaps inline for clarity, or you can update your ./api/kaito file.
-import FlexCard from './components/FlexCard'
+import { useState, type FormEvent } from 'react';
+import SearchGlass from './components/SearchGlass';
+import MetricsCard from './components/MetricsCard';
+import BackgroundBlobs from './components/BackgroundBlobs';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import type { KaitoYapData } from '../api/kaito';
 
-export interface KaitoYapData {
-  user_id: string;
-  username: string;
-  yaps_all: number;
-  yaps_l24h: number;
-  yaps_l48h: number;
-  yaps_l7d: number;
-  yaps_l30d: number;
-  yaps_l3m: number;
-  yaps_l6m: number;
-  [key: string]: unknown;
-}
-
-// Proxy endpoint: /api/yaps?username=...
-export async function fetchYaps(username: string): Promise<KaitoYapData> {
+async function fetchYaps(username: string): Promise<KaitoYapData> {
   const res = await fetch(`/api/yaps?username=${encodeURIComponent(username.trim())}`);
-
-  const text = await res.text();
-  try {
-    if (!res.ok) {
-      throw new Error(text || 'Failed to fetch data');
-    }
-    return JSON.parse(text) as KaitoYapData;
-  } catch (err) {
+  if (!res.ok) {
+    const text = await res.text();
     throw new Error(text || 'Failed to fetch data');
   }
+  return (await res.json()) as KaitoYapData;
 }
 
 export default function App() {
-  const [username, setUsername] = useState('')
-  const [data, setData] = useState<KaitoYapData | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [username, setUsername] = useState('');
+  const [data, setData] = useState<KaitoYapData | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    const name = username.trim()
-    if (!name) return
-    setLoading(true)
-    setError('')
-    setData(null)
+    e.preventDefault();
+    const name = username.trim();
+    if (!name) return;
+    setLoading(true);
+    setError('');
     try {
-      const res = await fetchYaps(name)
-      setData(res)
+      const res = await fetchYaps(name);
+      setData(res);
     } catch (err: any) {
-      setError(err.message || 'User not found or request failed')
+      setError(err.message || 'User not found');
+      setData(null);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <div className="w-full max-w-md space-y-4">
-        <form onSubmit={handleSubmit} className="flex space-x-2">
-          <input
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      <main className="relative flex flex-col items-center justify-center flex-1 text-center px-4">
+        <BackgroundBlobs />
+        <h1 className="text-6xl md:text-8xl font-extrabold text-white drop-shadow-lg">
+          Espresso Yaps Analytics
+        </h1>
+        <p className="text-lg text-gray-300 mt-4">Tokenized attention for X at a glance</p>
+        <div className="mt-8 w-full flex justify-center">
+          <SearchGlass
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Enter X username"
-            className="flex-grow rounded border border-gray-300 px-3 py-2 focus:outline-none"
+            onChange={setUsername}
+            onSubmit={handleSubmit}
+            loading={loading}
           />
-          <button
-            type="submit"
-            className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-          >
-            Submit
-          </button>
-        </form>
-        {loading && <p className="text-center">Loading...</p>}
-        {error && <p className="text-center text-red-500">{error}</p>}
-        {data && <FlexCard data={data} />}
-      </div>
+        </div>
+        {error && <p className="text-red-500 mt-4">{error}</p>}
+        {data && <MetricsCard data={data} />}
+      </main>
+      <Footer />
     </div>
-  )
+  );
 }
