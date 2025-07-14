@@ -13,53 +13,165 @@ const gameState: GameState = {
 }
 
 const backgrounds = [
-  { name: 'wood', color: '#D4A574' },
-  { name: 'concrete', color: '#95A5A6' },
-  { name: 'fabric', color: '#8D6E63' },
-  { name: 'gradient', colors: ['#FFB347', '#FFCC33'] },
+  { name: 'wood',    draw: drawWoodBg },
+  { name: 'concrete',draw: drawConcreteBg },
+  { name: 'fabric',  draw: drawFabricBg },
+  { name: 'gradient',draw: drawGradientBg },
+  { name: 'marble',  draw: drawMarbleBg },
+  { name: 'crystal', draw: drawCrystalBg },
+] as const
+
+const faceTypes = [
+  { name: 'male_square',   draw: drawMaleSquare },
+  { name: 'male_round',    draw: drawMaleRound },
+  { name: 'male_oval',     draw: drawMaleOval },
+  { name: 'male_chiseled', draw: drawMaleChiseled },
+  { name: 'female_round',  draw: drawFemaleRound },
+  { name: 'female_heart',  draw: drawFemaleHeart },
+  { name: 'female_oval',   draw: drawFemaleOval },
+  { name: 'female_diamond',draw: drawFemaleDiamond },
+] as const
+
+const hairStyles = [
+  { name: 'short',    color: '#EC4899', draw: drawShortHair },
+  { name: 'long',     color: '#3B82F6', draw: drawLongHair },
+  { name: 'braid',    color: '#10B981', draw: drawBraidHair },
+  { name: 'afro',     color: '#F59E0B', draw: drawAfroHair },
+  { name: 'ponytail', color: '#8B5CF6', draw: drawPonytailHair },
+] as const
+
+const hairColors = [
+  '#EC4899',
+  '#3B82F6',
+  '#10B981',
+  '#F59E0B',
+  '#8B5CF6',
+  '#EF4444',
+] as const
+
+const emotions = [
+  { name: 'happy',    draw: drawHappyEmotion },
+  { name: 'sad',      draw: drawSadEmotion },
+  { name: 'surprised',draw: drawSurprisedEmotion },
+  { name: 'neutral',  draw: drawNeutralEmotion },
+  { name: 'wink',     draw: drawWinkEmotion },
 ] as const
 
 const glassesStyles = [
-  { type: 'pixel', frame: '#333', pixelColor: '#fff' },
-  { type: 'visor', frame: '#000', accent: '#FF1493' },
-  { type: 'round', frame: '#222', accent: '#20B2AA' },
-] as const
-
-const hairTypes = [
-  { type: 'short', color: '#EC4899', draw: drawShortHair },
-  { type: 'long', color: '#3B82F6', draw: drawLongHair },
-  { type: 'braid', color: '#10B981', draw: drawBraidHair },
+  { type: 'pixel',     draw: drawPixelGlasses },
+  { type: 'visor',     draw: drawVisorGlasses },
+  { type: 'round',     draw: drawRoundGlasses },
+  { type: 'aviator',   draw: drawAviatorGlasses },
+  { type: 'futuristic',draw: drawFuturisticGlasses },
 ] as const
 
 const accessories = [
-  { type: 'earring', color: '#FFD700', draw: drawEarring },
-  { type: 'crown', color: '#C0C0C0', draw: drawCrown },
-  { type: 'none', color: '', draw: () => {} },
+  { name: 'earring',    draw: drawEarring },
+  { name: 'crown',      draw: drawCrown },
+  { name: 'hairPin',    draw: drawHairPin },
+  { name: 'headphones', draw: drawHeadphones },
+  { name: 'cigar',      draw: drawCigar },
+  { name: 'necklace',   draw: drawNecklace },
+  { name: 'mask',       draw: drawMask },
+  { name: 'none',       draw: () => {} },
 ] as const
 
 function pick<T>(arr: readonly T[]): T {
   return arr[Math.floor(Math.random() * arr.length)]
 }
 
-function drawBackground(
-  ctx: CanvasRenderingContext2D,
-  bg: (typeof backgrounds)[number]
-) {
-  if ('colors' in bg) {
-    const grad = ctx.createLinearGradient(0, 0, 300, 300)
-    grad.addColorStop(0, bg.colors[0])
-    grad.addColorStop(1, bg.colors[1])
-    ctx.fillStyle = grad
-  } else {
-    ctx.fillStyle = bg.color
-  }
+function drawWoodBg(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#D4A574'
   ctx.fillRect(0, 0, 300, 300)
 }
 
-function drawProfileFace(ctx: CanvasRenderingContext2D) {
+function drawConcreteBg(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#95A5A6'
+  ctx.fillRect(0, 0, 300, 300)
+}
+
+function drawFabricBg(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#8D6E63'
+  ctx.fillRect(0, 0, 300, 300)
+}
+
+function drawGradientBg(ctx: CanvasRenderingContext2D) {
+  const g = ctx.createLinearGradient(0, 0, 300, 300)
+  g.addColorStop(0, '#FFB347')
+  g.addColorStop(1, '#FFCC33')
+  ctx.fillStyle = g
+  ctx.fillRect(0, 0, 300, 300)
+}
+
+function drawMarbleBg(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#ECECEC'
+  ctx.fillRect(0, 0, 300, 300)
+}
+
+function drawCrystalBg(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#B9F2FF'
+  ctx.fillRect(0, 0, 300, 300)
+}
+
+function drawMaleSquare(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#fff'
+  ctx.fillRect(90, 80, 120, 140)
+}
+
+function drawMaleRound(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = '#fff'
   ctx.beginPath()
-  ctx.arc(150, 150, 80, 0, Math.PI * 2)
+  ctx.arc(150, 150, 70, 0, Math.PI * 2)
+  ctx.fill()
+}
+
+function drawMaleOval(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#fff'
+  ctx.beginPath()
+  ctx.ellipse(150, 150, 70, 90, 0, 0, Math.PI * 2)
+  ctx.fill()
+}
+
+function drawMaleChiseled(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#fff'
+  ctx.beginPath()
+  ctx.moveTo(100, 80)
+  ctx.lineTo(200, 80)
+  ctx.lineTo(220, 150)
+  ctx.lineTo(200, 220)
+  ctx.lineTo(100, 220)
+  ctx.lineTo(80, 150)
+  ctx.closePath()
+  ctx.fill()
+}
+
+function drawFemaleRound(ctx: CanvasRenderingContext2D) {
+  drawMaleRound(ctx)
+}
+
+function drawFemaleHeart(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#fff'
+  ctx.beginPath()
+  ctx.moveTo(150, 190)
+  ctx.bezierCurveTo(150, 170, 120, 150, 120, 120)
+  ctx.arc(135, 115, 15, Math.PI, 0)
+  ctx.arc(165, 115, 15, Math.PI, 0)
+  ctx.bezierCurveTo(180, 150, 150, 170, 150, 190)
+  ctx.fill()
+}
+
+function drawFemaleOval(ctx: CanvasRenderingContext2D) {
+  drawMaleOval(ctx)
+}
+
+function drawFemaleDiamond(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#fff'
+  ctx.beginPath()
+  ctx.moveTo(150, 80)
+  ctx.lineTo(200, 150)
+  ctx.lineTo(150, 220)
+  ctx.lineTo(100, 150)
+  ctx.closePath()
   ctx.fill()
 }
 
@@ -90,28 +202,112 @@ function drawBraidHair(ctx: CanvasRenderingContext2D, color: string) {
   }
 }
 
-function drawPixelGlasses(
-  ctx: CanvasRenderingContext2D,
-  frame: string,
-  pixel: string
-) {
-  ctx.fillStyle = frame
+function drawAfroHair(ctx: CanvasRenderingContext2D, color: string) {
+  ctx.fillStyle = color
+  ctx.beginPath()
+  ctx.arc(150, 80, 90, 0, Math.PI * 2)
+  ctx.fill()
+}
+
+function drawPonytailHair(ctx: CanvasRenderingContext2D, color: string) {
+  ctx.fillStyle = color
+  ctx.beginPath()
+  ctx.arc(150, 90, 80, Math.PI, Math.PI * 2)
+  ctx.fill()
+  ctx.beginPath()
+  ctx.moveTo(150, 170)
+  ctx.lineTo(170, 230)
+  ctx.lineTo(130, 230)
+  ctx.closePath()
+  ctx.fill()
+}
+
+function drawHappyEmotion(ctx: CanvasRenderingContext2D) {
+  ctx.strokeStyle = '#000'
+  ctx.lineWidth = 3
+  ctx.beginPath()
+  ctx.arc(110, 150, 10, 0, Math.PI * 2)
+  ctx.stroke()
+  ctx.beginPath()
+  ctx.arc(190, 150, 10, 0, Math.PI * 2)
+  ctx.stroke()
+  ctx.beginPath()
+  ctx.arc(150, 180, 25, 0, Math.PI)
+  ctx.stroke()
+}
+
+function drawSadEmotion(ctx: CanvasRenderingContext2D) {
+  ctx.strokeStyle = '#000'
+  ctx.lineWidth = 3
+  ctx.beginPath()
+  ctx.arc(110, 150, 10, 0, Math.PI * 2)
+  ctx.stroke()
+  ctx.beginPath()
+  ctx.arc(190, 150, 10, 0, Math.PI * 2)
+  ctx.stroke()
+  ctx.beginPath()
+  ctx.arc(150, 200, 25, Math.PI, 0)
+  ctx.stroke()
+}
+
+function drawSurprisedEmotion(ctx: CanvasRenderingContext2D) {
+  ctx.strokeStyle = '#000'
+  ctx.lineWidth = 3
+  ctx.beginPath()
+  ctx.arc(110, 150, 10, 0, Math.PI * 2)
+  ctx.stroke()
+  ctx.beginPath()
+  ctx.arc(190, 150, 10, 0, Math.PI * 2)
+  ctx.stroke()
+  ctx.beginPath()
+  ctx.arc(150, 185, 15, 0, Math.PI * 2)
+  ctx.stroke()
+}
+
+function drawNeutralEmotion(ctx: CanvasRenderingContext2D) {
+  ctx.strokeStyle = '#000'
+  ctx.lineWidth = 3
+  ctx.beginPath()
+  ctx.arc(110, 150, 10, 0, Math.PI * 2)
+  ctx.stroke()
+  ctx.beginPath()
+  ctx.arc(190, 150, 10, 0, Math.PI * 2)
+  ctx.stroke()
+  ctx.beginPath()
+  ctx.moveTo(130, 185)
+  ctx.lineTo(170, 185)
+  ctx.stroke()
+}
+
+function drawWinkEmotion(ctx: CanvasRenderingContext2D) {
+  ctx.strokeStyle = '#000'
+  ctx.lineWidth = 3
+  ctx.beginPath()
+  ctx.moveTo(100, 150)
+  ctx.lineTo(120, 150)
+  ctx.stroke()
+  ctx.beginPath()
+  ctx.arc(190, 150, 10, 0, Math.PI * 2)
+  ctx.stroke()
+  ctx.beginPath()
+  ctx.arc(150, 180, 25, 0, Math.PI)
+  ctx.stroke()
+}
+
+function drawPixelGlasses(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#333'
   ctx.fillRect(90, 130, 40, 20)
   ctx.fillRect(170, 130, 40, 20)
   ctx.fillRect(130, 135, 40, 10)
-  ctx.fillStyle = pixel
+  ctx.fillStyle = '#fff'
   ctx.fillRect(92, 132, 16, 16)
   ctx.fillRect(172, 132, 16, 16)
 }
 
-function drawVisorGlasses(
-  ctx: CanvasRenderingContext2D,
-  frame: string,
-  accent: string
-) {
-  ctx.fillStyle = frame
+function drawVisorGlasses(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#000'
   ctx.fillRect(90, 130, 120, 20)
-  ctx.strokeStyle = accent
+  ctx.strokeStyle = '#FF1493'
   ctx.lineWidth = 4
   ctx.beginPath()
   ctx.moveTo(90, 130)
@@ -119,12 +315,8 @@ function drawVisorGlasses(
   ctx.stroke()
 }
 
-function drawRoundGlasses(
-  ctx: CanvasRenderingContext2D,
-  frame: string,
-  accent: string
-) {
-  ctx.strokeStyle = frame
+function drawRoundGlasses(ctx: CanvasRenderingContext2D) {
+  ctx.strokeStyle = '#222'
   ctx.lineWidth = 4
   ctx.beginPath()
   ctx.arc(120, 140, 20, 0, Math.PI * 2)
@@ -134,22 +326,47 @@ function drawRoundGlasses(
   ctx.moveTo(140, 140)
   ctx.lineTo(160, 140)
   ctx.stroke()
-  ctx.strokeStyle = accent
+  ctx.strokeStyle = '#20B2AA'
   ctx.beginPath()
   ctx.moveTo(200, 140)
   ctx.lineTo(210, 140)
   ctx.stroke()
 }
 
-function drawEarring(ctx: CanvasRenderingContext2D, color: string) {
-  ctx.fillStyle = color
+function drawAviatorGlasses(ctx: CanvasRenderingContext2D) {
+  ctx.strokeStyle = '#222'
+  ctx.lineWidth = 4
+  ctx.beginPath()
+  ctx.moveTo(100, 130)
+  ctx.bezierCurveTo(120, 120, 140, 120, 160, 130)
+  ctx.bezierCurveTo(140, 160, 120, 160, 100, 130)
+  ctx.moveTo(200, 130)
+  ctx.bezierCurveTo(180, 120, 160, 120, 140, 130)
+  ctx.bezierCurveTo(160, 160, 180, 160, 200, 130)
+  ctx.stroke()
+  ctx.beginPath()
+  ctx.moveTo(140, 140)
+  ctx.lineTo(160, 140)
+  ctx.stroke()
+}
+
+function drawFuturisticGlasses(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#0ff'
+  ctx.fillRect(90, 135, 120, 15)
+  ctx.fillStyle = '#000'
+  ctx.fillRect(90, 132, 5, 20)
+  ctx.fillRect(205, 132, 5, 20)
+}
+
+function drawEarring(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#FFD700'
   ctx.beginPath()
   ctx.arc(220, 170, 5, 0, Math.PI * 2)
   ctx.fill()
 }
 
-function drawCrown(ctx: CanvasRenderingContext2D, color: string) {
-  ctx.fillStyle = color
+function drawCrown(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#C0C0C0'
   ctx.beginPath()
   ctx.moveTo(120, 80)
   ctx.lineTo(150, 40)
@@ -158,33 +375,66 @@ function drawCrown(ctx: CanvasRenderingContext2D, color: string) {
   ctx.fill()
 }
 
+function drawHairPin(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#FFD700'
+  ctx.fillRect(190, 100, 4, 30)
+}
+
+function drawHeadphones(ctx: CanvasRenderingContext2D) {
+  ctx.strokeStyle = '#555'
+  ctx.lineWidth = 8
+  ctx.beginPath()
+  ctx.arc(150, 120, 90, Math.PI * 1.2, Math.PI * 1.8)
+  ctx.stroke()
+  ctx.fillStyle = '#000'
+  ctx.fillRect(60, 120, 20, 40)
+  ctx.fillRect(220, 120, 20, 40)
+}
+
+function drawCigar(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#8B4513'
+  ctx.fillRect(170, 180, 40, 8)
+  ctx.fillStyle = '#f00'
+  ctx.fillRect(210, 180, 6, 8)
+}
+
+function drawNecklace(ctx: CanvasRenderingContext2D) {
+  ctx.strokeStyle = '#FFD700'
+  ctx.lineWidth = 4
+  ctx.beginPath()
+  ctx.arc(150, 220, 40, 0, Math.PI)
+  ctx.stroke()
+}
+
+function drawMask(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#ccc'
+  ctx.fillRect(110, 160, 80, 30)
+}
+
 export default function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [twitterUser, setTwitterUser] = useState('')
 
   const drawAvatar = useCallback((ctx: CanvasRenderingContext2D) => {
     const bg = pick(backgrounds)
-    const glasses = pick(glassesStyles)
-    const hair = pick(hairTypes)
+    const face = pick(faceTypes)
+    const hair = pick(hairStyles)
+    const hairCol = pick(hairColors)
+    const emo = pick(emotions)
+    const g = pick(glassesStyles)
     const acc = pick(accessories)
 
     ctx.clearRect(0, 0, 300, 300)
-    drawBackground(ctx, bg)
-    drawProfileFace(ctx)
-    hair.draw(ctx, hair.color)
-    if (glasses.type === 'pixel')
-      drawPixelGlasses(ctx, glasses.frame, glasses.pixelColor)
-    if (glasses.type === 'visor')
-      drawVisorGlasses(ctx, glasses.frame, glasses.accent)
-    if (glasses.type === 'round')
-      drawRoundGlasses(ctx, glasses.frame, glasses.accent)
-    acc.draw(ctx, acc.color)
+    bg.draw(ctx)
+    face.draw(ctx)
+    hair.draw(ctx, hairCol)
+    emo.draw(ctx)
+    g.draw(ctx)
+    acc.draw(ctx)
 
-    const rarity = determineRarity()
-    gameState.currentRarity = rarity
-    updateRarityBadge(rarity)
+    updateRarityBadge(determineRarity())
     gameState.totalGenerated++
-    if (rarity === 'Legendary') gameState.legendaryFound++
+    if (gameState.currentRarity === 'Legendary') gameState.legendaryFound++
   }, [])
 
   const handleGenerate = useCallback(() => {
