@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface GameState {
   totalGenerated: number
@@ -20,7 +20,6 @@ const avatarComponents = {
 export default function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [twitterUser, setTwitterUser] = useState('')
-  const [connected, setConnected] = useState(false)
 
   useEffect(() => {
     generatePFP()
@@ -61,9 +60,7 @@ export default function App() {
     ctx.fill()
   }
 
-  function drawAccessory(ctx: CanvasRenderingContext2D) {}
-  function drawBrainPattern(ctx: CanvasRenderingContext2D) {}
-  function drawTechAccessory(ctx: CanvasRenderingContext2D) {}
+  function drawAccessory() {}
 
   function drawLegendaryEffects(ctx: CanvasRenderingContext2D) {
     ctx.strokeStyle = '#ffd700'
@@ -96,7 +93,7 @@ export default function App() {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     drawBackground(ctx, data.color)
     drawProfileFace(ctx)
-    drawAccessory(ctx)
+    drawAccessory()
     if (data.rarity === 'Legendary') drawLegendaryEffects(ctx)
     updateRarityBadge(data.rarity)
     gameState.totalGenerated++
@@ -147,7 +144,6 @@ export default function App() {
   }
 
   function connectTwitter() {
-    setConnected(true)
     setTwitterUser('anon')
     const status = document.getElementById('twitterStatus')
     if (status) status.style.display = 'block'
