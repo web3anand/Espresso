@@ -1,92 +1,254 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Stage, Layer, Line, Image as KImage } from 'react-konva'
-import useImage from 'use-image'
 
-function generateBlobVertices(radius: number, points: number): number[] {
-  const coords: number[] = []
-  for (let i = 0; i < points; i++) {
-    const angle = (Math.PI * 2 * i) / points
-    const dist = radius + Math.random() * 40 - 20
-    const x = 200 + dist * Math.cos(angle)
-    const y = 200 + dist * Math.sin(angle)
-    coords.push(x, y)
-  }
-  return coords
+interface GameState {
+  totalGenerated: number
+  legendaryFound: number
+  currentRarity: string
+}
+
+const gameState: GameState = {
+  totalGenerated: 0,
+  legendaryFound: 0,
+  currentRarity: 'Common',
+}
+
+const avatarComponents = {
+  colors: ['#ef4444', '#60a5fa', '#a855f7', '#facc15'],
+  accessories: ['glasses', 'hat', 'earring'],
 }
 
 export default function App() {
-  const [imgUrl, setImgUrl] = useState('')
-  const [blobPoints, setBlobPoints] = useState<number[]>([])
-  const stageRef = useRef<any>(null)
-  const [image] = useImage(imgUrl, 'anonymous')
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [twitterUser, setTwitterUser] = useState('')
+  const [connected, setConnected] = useState(false)
 
   useEffect(() => {
-    setBlobPoints(generateBlobVertices(200, 8))
+    generatePFP()
+    updateStats()
   }, [])
 
-  function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (file) {
-      setImgUrl(URL.createObjectURL(file))
+  function determineRarity() {
+    const r = Math.random()
+    if (r < 0.01) return 'Legendary'
+    if (r < 0.1) return 'Epic'
+    if (r < 0.3) return 'Rare'
+    return 'Common'
+  }
+
+  function generateAvatarData(forced?: string) {
+    return {
+      color:
+        avatarComponents.colors[
+          Math.floor(Math.random() * avatarComponents.colors.length)
+        ],
+      accessory:
+        avatarComponents.accessories[
+          Math.floor(Math.random() * avatarComponents.accessories.length)
+        ],
+      rarity: forced || determineRarity(),
     }
   }
 
-  function handleSample(e: React.ChangeEvent<HTMLSelectElement>) {
-    setImgUrl(e.target.value)
+  function drawBackground(ctx: CanvasRenderingContext2D, color: string) {
+    ctx.fillStyle = color
+    ctx.fillRect(0, 0, 300, 300)
   }
 
-  function handleDownload() {
-    const uri = stageRef.current?.toDataURL({ pixelRatio: 2 })
-    if (!uri) return
+  function drawProfileFace(ctx: CanvasRenderingContext2D) {
+    ctx.fillStyle = '#fff'
+    ctx.beginPath()
+    ctx.arc(150, 150, 100, 0, Math.PI * 2)
+    ctx.fill()
+  }
+
+  function drawAccessory(_ctx: CanvasRenderingContext2D) {}
+  function drawBrainPattern(_ctx: CanvasRenderingContext2D) {}
+  function drawTechAccessory(_ctx: CanvasRenderingContext2D) {}
+
+  function drawLegendaryEffects(ctx: CanvasRenderingContext2D) {
+    ctx.strokeStyle = '#ffd700'
+    ctx.lineWidth = 6
+    ctx.strokeRect(10, 10, 280, 280)
+  }
+
+  function updateRarityBadge(rarity: string) {
+    const badge = document.getElementById('rarityBadge')
+    if (badge) {
+      badge.textContent = rarity
+      badge.className = 'rarity-badge ' + rarity.toLowerCase()
+    }
+  }
+
+  function updateStats() {
+    const total = document.getElementById('totalGenerated')
+    const leg = document.getElementById('legendaryFound')
+    const curr = document.getElementById('currentRarity')
+    if (total) total.textContent = String(gameState.totalGenerated)
+    if (leg) leg.textContent = String(gameState.legendaryFound)
+    if (curr) curr.textContent = gameState.currentRarity
+  }
+
+  function drawAvatar(data: { color: string; rarity: string }) {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    drawBackground(ctx, data.color)
+    drawProfileFace(ctx)
+    drawAccessory(ctx)
+    if (data.rarity === 'Legendary') drawLegendaryEffects(ctx)
+    updateRarityBadge(data.rarity)
+    gameState.totalGenerated++
+    if (data.rarity === 'Legendary') gameState.legendaryFound++
+    gameState.currentRarity = data.rarity
+  }
+
+  function generatePFP() {
+    const data = generateAvatarData()
+    drawAvatar(data)
+    addToGallery()
+    updateStats()
+  }
+
+  function forceLegendary() {
+    const data = generateAvatarData('Legendary')
+    drawAvatar(data)
+    addToGallery()
+    updateStats()
+  }
+
+  function addToGallery() {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const img = new Image()
+    img.src = canvas.toDataURL('image/png')
+    const gallery = document.getElementById('gallery')
+    if (gallery) gallery.appendChild(img)
+  }
+
+  function showLegendaryModal() {
+    const modal = document.getElementById('shareModal')
+    if (modal) modal.style.display = 'flex'
+  }
+
+  function closeModal() {
+    const modal = document.getElementById('shareModal')
+    if (modal) modal.style.display = 'none'
+  }
+
+  function downloadPFP() {
+    const canvas = canvasRef.current
+    if (!canvas) return
     const link = document.createElement('a')
-    link.download = 'pfp.png'
-    link.href = uri
+    link.download = 'avatar.png'
+    link.href = canvas.toDataURL('image/png')
     link.click()
   }
 
+  function connectTwitter() {
+    setConnected(true)
+    setTwitterUser('anon')
+    const status = document.getElementById('twitterStatus')
+    if (status) status.style.display = 'block'
+  }
+
+  function shareToTwitter() {
+    showLegendaryModal()
+  }
+
+  function copyShareLink() {
+    navigator.clipboard.writeText(window.location.href)
+  }
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if ((e.target as HTMLElement).classList.contains('modal')) {
+        closeModal()
+      }
+    }
+    window.addEventListener('click', handler)
+    return () => window.removeEventListener('click', handler)
+  }, [])
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center py-12 px-4">
-      <div className="bg-white rounded-xl shadow-lg p-6 max-w-lg w-full flex flex-col items-center">
-        <h1 className="text-3xl font-bold mb-8">Custom PFP Generator</h1>
-        <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFile}
-            className="file:bg-indigo-600 file:text-white file:px-4 file:py-2 file:rounded file:hover:bg-indigo-700"
-          />
-          <select onChange={handleSample} className="border rounded px-3 py-2">
-            <option value="">Load Sample</option>
-            <option value="/samples/sample1.png">Sample 1</option>
-            <option value="/samples/sample2.png">Sample 2</option>
-            <option value="/samples/sample3.png">Sample 3</option>
-          </select>
-          <button
-            onClick={handleDownload}
-            className="bg-indigo-600 text-white px-4 py-2 rounded transition hover:bg-indigo-700"
-          >
-            Generate &amp; Download PFP
+    <div className="container">
+      <header className="header">
+        <h1>✨ AI Avatar Generator ✨</h1>
+        <p>Generate unique profile pictures with legendary rarity system</p>
+      </header>
+      <div className="main-content">
+        <section className="generator-section">
+          <div className="pfp-display" id="pfpDisplay">
+            <canvas
+              id="pfpCanvas"
+              width={300}
+              height={300}
+              ref={canvasRef}
+            ></canvas>
+            <div id="rarityBadge" className="rarity-badge common">
+              Common
+            </div>
+          </div>
+          <div className="controls">
+            <button className="btn" onClick={generatePFP}>
+              Generate New
+            </button>
+            <button className="btn btn-legendary" onClick={forceLegendary}>
+              Try Legendary
+            </button>
+            <button className="btn" onClick={downloadPFP}>
+              Download
+            </button>
+          </div>
+        </section>
+
+        <section className="generator-section">
+          <button className="btn btn-twitter" onClick={connectTwitter}>
+            Connect Twitter
           </button>
+          <div id="twitterStatus">
+            Connected as {twitterUser}
+            <button className="btn" onClick={shareToTwitter}>
+              Share Avatar
+            </button>
+          </div>
+        </section>
+
+        <section className="generator-section">
+          <div className="controls">
+            <span className="rarity-badge common">Common 69%</span>
+            <span className="rarity-badge rare">Rare 20%</span>
+            <span className="rarity-badge epic">Epic 10%</span>
+            <span className="rarity-badge legendary">Legendary 1%</span>
+          </div>
+        </section>
+
+        <section className="stats-section">
+          <div>
+            Total Generated: <span id="totalGenerated">0</span>
+          </div>
+          <div>
+            Legendary Found: <span id="legendaryFound">0</span>
+          </div>
+          <div>
+            Current Rarity: <span id="currentRarity">Common</span>
+          </div>
+        </section>
+
+        <div className="gallery" id="gallery"></div>
+
+        <div id="shareModal" className="modal">
+          <div className="modal-content">
+            <span className="close" onClick={closeModal}>
+              &times;
+            </span>
+            <p>Share this avatar on Twitter!</p>
+            <button className="btn" onClick={copyShareLink}>
+              Copy Link
+            </button>
+          </div>
         </div>
-        <Stage ref={stageRef} width={400} height={400} className="mx-auto">
-          <Layer>
-            <Line points={blobPoints} closed fill="#A78BFA" opacity={0.6} />
-          </Layer>
-          <Layer>
-            {image && (
-              <KImage
-                x={100}
-                y={100}
-                width={200}
-                height={200}
-                image={image}
-                clipFunc={(ctx) => {
-                  ctx.arc(100, 100, 100, 0, Math.PI * 2)
-                }}
-              />
-            )}
-          </Layer>
-        </Stage>
       </div>
     </div>
   )
