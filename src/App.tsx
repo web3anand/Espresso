@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 
 interface GameState {
   totalGenerated: number
@@ -12,19 +12,274 @@ const gameState: GameState = {
   currentRarity: 'Common',
 }
 
-const avatarComponents = {
-  colors: ['#ef4444', '#60a5fa', '#a855f7', '#facc15'],
-  accessories: ['glasses', 'hat', 'earring'],
+const backgrounds = [
+  { name: 'wood',    draw: drawWoodBg },
+  { name: 'concrete',draw: drawConcreteBg },
+  { name: 'fabric',  draw: drawFabricBg },
+  { name: 'gradient',draw: drawGradientBg },
+  { name: 'marble',  draw: drawMarbleBg },
+  { name: 'crystal', draw: drawCrystalBg },
+] as const
+
+
+
+const hairColors = [
+  '#EC4899',
+  '#3B82F6',
+  '#10B981',
+  '#F59E0B',
+  '#8B5CF6',
+  '#EF4444',
+] as const
+
+
+const glassesStyles = [
+  { type: 'pixel',     draw: drawPixelGlasses },
+  { type: 'visor',     draw: drawVisorGlasses },
+  { type: 'round',     draw: drawRoundGlasses },
+  { type: 'aviator',   draw: drawAviatorGlasses },
+  { type: 'futuristic',draw: drawFuturisticGlasses },
+] as const
+
+const accessories = [
+  { name: 'earring',    draw: drawEarring },
+  { name: 'crown',      draw: drawCrown },
+  { name: 'hairPin',    draw: drawHairPin },
+  { name: 'headphones', draw: drawHeadphones },
+  { name: 'cigar',      draw: drawCigar },
+  { name: 'necklace',   draw: drawNecklace },
+  { name: 'mask',       draw: drawMask },
+  { name: 'none',       draw: () => {} },
+] as const
+
+function pick<T>(arr: readonly T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)]
+}
+
+function drawWoodBg(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#D4A574'
+  ctx.fillRect(0, 0, 300, 300)
+}
+
+function drawConcreteBg(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#95A5A6'
+  ctx.fillRect(0, 0, 300, 300)
+}
+
+function drawFabricBg(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#8D6E63'
+  ctx.fillRect(0, 0, 300, 300)
+}
+
+function drawGradientBg(ctx: CanvasRenderingContext2D) {
+  const g = ctx.createLinearGradient(0, 0, 300, 300)
+  g.addColorStop(0, '#FFB347')
+  g.addColorStop(1, '#FFCC33')
+  ctx.fillStyle = g
+  ctx.fillRect(0, 0, 300, 300)
+}
+
+function drawMarbleBg(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#ECECEC'
+  ctx.fillRect(0, 0, 300, 300)
+}
+
+function drawCrystalBg(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#B9F2FF'
+  ctx.fillRect(0, 0, 300, 300)
+}
+function drawProfileFace(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#ffe0bd'
+  ctx.beginPath()
+  ctx.moveTo(120, 220)
+  ctx.quadraticCurveTo(130, 180, 120, 130)
+  ctx.quadraticCurveTo(130, 60, 180, 60)
+  ctx.quadraticCurveTo(210, 70, 210, 120)
+  ctx.quadraticCurveTo(220, 145, 210, 160)
+  ctx.quadraticCurveTo(205, 170, 190, 172)
+  ctx.quadraticCurveTo(170, 175, 170, 190)
+  ctx.quadraticCurveTo(150, 200, 120, 220)
+  ctx.closePath()
+  ctx.fill()
+}
+
+function drawHair(ctx: CanvasRenderingContext2D, color: string) {
+  ctx.fillStyle = color
+  ctx.beginPath()
+  ctx.moveTo(115, 80)
+  ctx.quadraticCurveTo(120, 30, 180, 30)
+  ctx.quadraticCurveTo(220, 40, 230, 80)
+  ctx.lineTo(210, 120)
+  ctx.quadraticCurveTo(200, 70, 150, 60)
+  ctx.quadraticCurveTo(130, 60, 115, 80)
+  ctx.closePath()
+  ctx.fill()
+}
+
+function drawFaceFeatures(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#000'
+  ctx.beginPath()
+  ctx.arc(190, 120, 8, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.beginPath()
+  ctx.moveTo(210, 120)
+  ctx.quadraticCurveTo(215, 135, 210, 150)
+  ctx.strokeStyle = '#000'
+  ctx.lineWidth = 2
+  ctx.stroke()
+  ctx.beginPath()
+  ctx.arc(150, 150, 12, Math.PI * 0.5, Math.PI * 1.5)
+  ctx.stroke()
+}
+
+function drawPixelGlasses(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#333'
+  ctx.fillRect(175, 110, 30, 18)
+  ctx.fillRect(205, 114, 18, 6)
+  ctx.fillStyle = '#fff'
+  ctx.fillRect(177, 112, 14, 14)
+}
+
+function drawVisorGlasses(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#000'
+  ctx.fillRect(170, 112, 50, 16)
+  ctx.strokeStyle = '#FF1493'
+  ctx.lineWidth = 4
+  ctx.beginPath()
+  ctx.moveTo(170, 112)
+  ctx.lineTo(220, 112)
+  ctx.stroke()
+}
+
+function drawRoundGlasses(ctx: CanvasRenderingContext2D) {
+  ctx.strokeStyle = '#222'
+  ctx.lineWidth = 4
+  ctx.beginPath()
+  ctx.arc(190, 120, 18, 0, Math.PI * 2)
+  ctx.stroke()
+  ctx.beginPath()
+  ctx.moveTo(208, 120)
+  ctx.lineTo(226, 120)
+  ctx.stroke()
+  ctx.strokeStyle = '#20B2AA'
+  ctx.beginPath()
+  ctx.moveTo(208, 120)
+  ctx.lineTo(226, 120)
+  ctx.stroke()
+}
+
+function drawAviatorGlasses(ctx: CanvasRenderingContext2D) {
+  ctx.strokeStyle = '#222'
+  ctx.lineWidth = 4
+  ctx.beginPath()
+  ctx.moveTo(170, 116)
+  ctx.bezierCurveTo(185, 108, 205, 108, 218, 116)
+  ctx.bezierCurveTo(205, 140, 185, 140, 170, 116)
+  ctx.stroke()
+  ctx.beginPath()
+  ctx.moveTo(188, 120)
+  ctx.lineTo(206, 120)
+  ctx.stroke()
+}
+
+function drawFuturisticGlasses(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#0ff'
+  ctx.fillRect(170, 116, 50, 12)
+  ctx.fillStyle = '#000'
+  ctx.fillRect(170, 114, 6, 16)
+  ctx.fillRect(214, 114, 6, 16)
+}
+
+function drawEarring(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#FFD700'
+  ctx.beginPath()
+  ctx.arc(158, 150, 4, 0, Math.PI * 2)
+  ctx.fill()
+}
+
+function drawCrown(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#C0C0C0'
+  ctx.beginPath()
+  ctx.moveTo(140, 40)
+  ctx.lineTo(170, 20)
+  ctx.lineTo(200, 40)
+  ctx.closePath()
+  ctx.fill()
+}
+
+function drawHairPin(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#FFD700'
+  ctx.fillRect(200, 90, 4, 30)
+}
+
+function drawHeadphones(ctx: CanvasRenderingContext2D) {
+  ctx.strokeStyle = '#555'
+  ctx.lineWidth = 8
+  ctx.beginPath()
+  ctx.arc(150, 120, 90, Math.PI * 1.3, Math.PI * 1.9)
+  ctx.stroke()
+  ctx.fillStyle = '#000'
+  ctx.fillRect(60, 120, 20, 40)
+}
+
+function drawCigar(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#8B4513'
+  ctx.fillRect(200, 160, 40, 6)
+  ctx.fillStyle = '#f00'
+  ctx.fillRect(240, 160, 6, 6)
+}
+
+function drawNecklace(ctx: CanvasRenderingContext2D) {
+  ctx.strokeStyle = '#FFD700'
+  ctx.lineWidth = 4
+  ctx.beginPath()
+  ctx.arc(140, 220, 40, Math.PI * 0.1, Math.PI * 0.9)
+  ctx.stroke()
+}
+
+function drawMask(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#ccc'
+  ctx.fillRect(160, 140, 60, 40)
 }
 
 export default function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [twitterUser, setTwitterUser] = useState('')
 
-  useEffect(() => {
-    generatePFP()
-    updateStats()
+  const drawAvatar = useCallback((ctx: CanvasRenderingContext2D) => {
+    const bg = pick(backgrounds)
+    const hairColor = pick(hairColors)
+    const g = pick(glassesStyles)
+    const acc = pick(accessories)
+
+    ctx.clearRect(0, 0, 300, 300)
+    bg.draw(ctx)
+    drawProfileFace(ctx)
+    drawHair(ctx, hairColor)
+    drawFaceFeatures(ctx)
+    g.draw(ctx)
+    acc.draw(ctx)
+
+    updateRarityBadge(determineRarity())
+    gameState.totalGenerated++
+    if (gameState.currentRarity === 'Legendary') gameState.legendaryFound++
   }, [])
+
+  const handleGenerate = useCallback(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D | null
+    if (!ctx) return
+    drawAvatar(ctx)
+    addToGallery()
+    updateStats()
+  }, [drawAvatar])
+
+
+
+  useEffect(() => {
+    handleGenerate()
+  }, [handleGenerate])
 
   function determineRarity() {
     const r = Math.random()
@@ -32,40 +287,6 @@ export default function App() {
     if (r < 0.1) return 'Epic'
     if (r < 0.3) return 'Rare'
     return 'Common'
-  }
-
-  function generateAvatarData(forced?: string) {
-    return {
-      color:
-        avatarComponents.colors[
-          Math.floor(Math.random() * avatarComponents.colors.length)
-        ],
-      accessory:
-        avatarComponents.accessories[
-          Math.floor(Math.random() * avatarComponents.accessories.length)
-        ],
-      rarity: forced || determineRarity(),
-    }
-  }
-
-  function drawBackground(ctx: CanvasRenderingContext2D, color: string) {
-    ctx.fillStyle = color
-    ctx.fillRect(0, 0, 300, 300)
-  }
-
-  function drawProfileFace(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = '#fff'
-    ctx.beginPath()
-    ctx.arc(150, 150, 100, 0, Math.PI * 2)
-    ctx.fill()
-  }
-
-  function drawAccessory() {}
-
-  function drawLegendaryEffects(ctx: CanvasRenderingContext2D) {
-    ctx.strokeStyle = '#ffd700'
-    ctx.lineWidth = 6
-    ctx.strokeRect(10, 10, 280, 280)
   }
 
   function updateRarityBadge(rarity: string) {
@@ -85,35 +306,6 @@ export default function App() {
     if (curr) curr.textContent = gameState.currentRarity
   }
 
-  function drawAvatar(data: { color: string; rarity: string }) {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D | null
-    if (!ctx) return
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-    drawBackground(ctx, data.color)
-    drawProfileFace(ctx)
-    drawAccessory()
-    if (data.rarity === 'Legendary') drawLegendaryEffects(ctx)
-    updateRarityBadge(data.rarity)
-    gameState.totalGenerated++
-    if (data.rarity === 'Legendary') gameState.legendaryFound++
-    gameState.currentRarity = data.rarity
-  }
-
-  function generatePFP() {
-    const data = generateAvatarData()
-    drawAvatar(data)
-    addToGallery()
-    updateStats()
-  }
-
-  function forceLegendary() {
-    const data = generateAvatarData('Legendary')
-    drawAvatar(data)
-    addToGallery()
-    updateStats()
-  }
 
   function addToGallery() {
     const canvas = canvasRef.current
@@ -187,11 +379,8 @@ export default function App() {
             </div>
           </div>
           <div className="controls">
-            <button className="btn" onClick={generatePFP}>
+            <button className="btn" onClick={handleGenerate}>
               Generate New
-            </button>
-            <button className="btn btn-legendary" onClick={forceLegendary}>
-              Try Legendary
             </button>
             <button className="btn" onClick={downloadPFP}>
               Download
