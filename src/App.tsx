@@ -27,12 +27,12 @@ export default function App() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // draw espresso-style blobs
-    const blobs = [
+    const blobs: Array<[string, number, number, number]> = [
       ['#6d28d9', 120, 120, 140],
       ['#db2777', 280, 160, 100],
       ['#22d3ee', 180, 280, 120],
     ];
-    blobs.forEach(([color, x, y, r]) => {
+    blobs.forEach(([color, x, y, r]: [string, number, number, number]) => {
       ctx.fillStyle = color;
       ctx.globalAlpha = 0.5;
       ctx.beginPath();
