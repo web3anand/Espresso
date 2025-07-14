@@ -13,6 +13,8 @@
     "react-dom": "^19.1.0",
     "konva": "^9.4.0",
     "react-konva": "^18.0.3",
+    "konva": "^9.3.22",
+    "react-konva": "^19.0.7",
     "use-image": "^1.1.4"
   },
   "devDependencies": {
