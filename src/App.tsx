@@ -21,24 +21,7 @@ const backgrounds = [
   { name: 'crystal', draw: drawCrystalBg },
 ] as const
 
-const faceTypes = [
-  { name: 'male_square',   draw: drawMaleSquare },
-  { name: 'male_round',    draw: drawMaleRound },
-  { name: 'male_oval',     draw: drawMaleOval },
-  { name: 'male_chiseled', draw: drawMaleChiseled },
-  { name: 'female_round',  draw: drawFemaleRound },
-  { name: 'female_heart',  draw: drawFemaleHeart },
-  { name: 'female_oval',   draw: drawFemaleOval },
-  { name: 'female_diamond',draw: drawFemaleDiamond },
-] as const
 
-const hairStyles = [
-  { name: 'short',    color: '#EC4899', draw: drawShortHair },
-  { name: 'long',     color: '#3B82F6', draw: drawLongHair },
-  { name: 'braid',    color: '#10B981', draw: drawBraidHair },
-  { name: 'afro',     color: '#F59E0B', draw: drawAfroHair },
-  { name: 'ponytail', color: '#8B5CF6', draw: drawPonytailHair },
-] as const
 
 const hairColors = [
   '#EC4899',
@@ -49,13 +32,6 @@ const hairColors = [
   '#EF4444',
 ] as const
 
-const emotions = [
-  { name: 'happy',    draw: drawHappyEmotion },
-  { name: 'sad',      draw: drawSadEmotion },
-  { name: 'surprised',draw: drawSurprisedEmotion },
-  { name: 'neutral',  draw: drawNeutralEmotion },
-  { name: 'wink',     draw: drawWinkEmotion },
-] as const
 
 const glassesStyles = [
   { type: 'pixel',     draw: drawPixelGlasses },
@@ -112,185 +88,42 @@ function drawCrystalBg(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = '#B9F2FF'
   ctx.fillRect(0, 0, 300, 300)
 }
-
-function drawMaleSquare(ctx: CanvasRenderingContext2D) {
-  ctx.fillStyle = '#fff'
-  ctx.fillRect(90, 80, 120, 140)
-}
-
-function drawMaleRound(ctx: CanvasRenderingContext2D) {
-  ctx.fillStyle = '#fff'
+function drawProfileFace(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#ffe0bd'
   ctx.beginPath()
-  ctx.arc(150, 150, 70, 0, Math.PI * 2)
-  ctx.fill()
-}
-
-function drawMaleOval(ctx: CanvasRenderingContext2D) {
-  ctx.fillStyle = '#fff'
-  ctx.beginPath()
-  ctx.ellipse(150, 150, 70, 90, 0, 0, Math.PI * 2)
-  ctx.fill()
-}
-
-function drawMaleChiseled(ctx: CanvasRenderingContext2D) {
-  ctx.fillStyle = '#fff'
-  ctx.beginPath()
-  ctx.moveTo(100, 80)
-  ctx.lineTo(200, 80)
-  ctx.lineTo(220, 150)
-  ctx.lineTo(200, 220)
-  ctx.lineTo(100, 220)
-  ctx.lineTo(80, 150)
+  ctx.moveTo(150, 70)
+  ctx.bezierCurveTo(100, 70, 90, 150, 110, 210)
+  ctx.quadraticCurveTo(150, 230, 190, 210)
+  ctx.bezierCurveTo(210, 150, 200, 70, 150, 70)
   ctx.closePath()
   ctx.fill()
 }
 
-function drawFemaleRound(ctx: CanvasRenderingContext2D) {
-  drawMaleRound(ctx)
-}
-
-function drawFemaleHeart(ctx: CanvasRenderingContext2D) {
-  ctx.fillStyle = '#fff'
+function drawHair(ctx: CanvasRenderingContext2D, color: string) {
+  ctx.fillStyle = color
   ctx.beginPath()
-  ctx.moveTo(150, 190)
-  ctx.bezierCurveTo(150, 170, 120, 150, 120, 120)
-  ctx.arc(135, 115, 15, Math.PI, 0)
-  ctx.arc(165, 115, 15, Math.PI, 0)
-  ctx.bezierCurveTo(180, 150, 150, 170, 150, 190)
-  ctx.fill()
-}
-
-function drawFemaleOval(ctx: CanvasRenderingContext2D) {
-  drawMaleOval(ctx)
-}
-
-function drawFemaleDiamond(ctx: CanvasRenderingContext2D) {
-  ctx.fillStyle = '#fff'
-  ctx.beginPath()
-  ctx.moveTo(150, 80)
-  ctx.lineTo(200, 150)
-  ctx.lineTo(150, 220)
-  ctx.lineTo(100, 150)
+  ctx.moveTo(60, 80)
+  ctx.bezierCurveTo(90, 20, 210, 20, 240, 80)
+  ctx.lineTo(240, 120)
+  ctx.bezierCurveTo(200, 80, 100, 80, 60, 120)
   ctx.closePath()
   ctx.fill()
 }
 
-function drawShortHair(ctx: CanvasRenderingContext2D, color: string) {
-  ctx.fillStyle = color
+function drawFaceFeatures(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#000'
   ctx.beginPath()
-  ctx.arc(150, 110, 80, Math.PI, Math.PI * 2)
-  ctx.fill()
-}
-
-function drawLongHair(ctx: CanvasRenderingContext2D, color: string) {
-  ctx.fillStyle = color
-  ctx.beginPath()
-  ctx.arc(150, 90, 90, Math.PI, Math.PI * 2)
-  ctx.fill()
-  ctx.fillRect(60, 90, 180, 120)
-}
-
-function drawBraidHair(ctx: CanvasRenderingContext2D, color: string) {
-  ctx.fillStyle = color
-  ctx.beginPath()
-  ctx.arc(150, 100, 80, Math.PI, Math.PI * 2)
-  ctx.fill()
-  for (let i = 0; i < 3; i++) {
-    ctx.beginPath()
-    ctx.arc(150, 160 + i * 20, 20, 0, Math.PI * 2)
-    ctx.fill()
-  }
-}
-
-function drawAfroHair(ctx: CanvasRenderingContext2D, color: string) {
-  ctx.fillStyle = color
-  ctx.beginPath()
-  ctx.arc(150, 80, 90, 0, Math.PI * 2)
-  ctx.fill()
-}
-
-function drawPonytailHair(ctx: CanvasRenderingContext2D, color: string) {
-  ctx.fillStyle = color
-  ctx.beginPath()
-  ctx.arc(150, 90, 80, Math.PI, Math.PI * 2)
+  ctx.arc(125, 150, 6, 0, Math.PI * 2)
+  ctx.arc(175, 150, 6, 0, Math.PI * 2)
   ctx.fill()
   ctx.beginPath()
-  ctx.moveTo(150, 170)
-  ctx.lineTo(170, 230)
-  ctx.lineTo(130, 230)
-  ctx.closePath()
-  ctx.fill()
-}
-
-function drawHappyEmotion(ctx: CanvasRenderingContext2D) {
+  ctx.moveTo(150, 160)
+  ctx.lineTo(150, 180)
   ctx.strokeStyle = '#000'
-  ctx.lineWidth = 3
-  ctx.beginPath()
-  ctx.arc(110, 150, 10, 0, Math.PI * 2)
+  ctx.lineWidth = 2
   ctx.stroke()
   ctx.beginPath()
-  ctx.arc(190, 150, 10, 0, Math.PI * 2)
-  ctx.stroke()
-  ctx.beginPath()
-  ctx.arc(150, 180, 25, 0, Math.PI)
-  ctx.stroke()
-}
-
-function drawSadEmotion(ctx: CanvasRenderingContext2D) {
-  ctx.strokeStyle = '#000'
-  ctx.lineWidth = 3
-  ctx.beginPath()
-  ctx.arc(110, 150, 10, 0, Math.PI * 2)
-  ctx.stroke()
-  ctx.beginPath()
-  ctx.arc(190, 150, 10, 0, Math.PI * 2)
-  ctx.stroke()
-  ctx.beginPath()
-  ctx.arc(150, 200, 25, Math.PI, 0)
-  ctx.stroke()
-}
-
-function drawSurprisedEmotion(ctx: CanvasRenderingContext2D) {
-  ctx.strokeStyle = '#000'
-  ctx.lineWidth = 3
-  ctx.beginPath()
-  ctx.arc(110, 150, 10, 0, Math.PI * 2)
-  ctx.stroke()
-  ctx.beginPath()
-  ctx.arc(190, 150, 10, 0, Math.PI * 2)
-  ctx.stroke()
-  ctx.beginPath()
-  ctx.arc(150, 185, 15, 0, Math.PI * 2)
-  ctx.stroke()
-}
-
-function drawNeutralEmotion(ctx: CanvasRenderingContext2D) {
-  ctx.strokeStyle = '#000'
-  ctx.lineWidth = 3
-  ctx.beginPath()
-  ctx.arc(110, 150, 10, 0, Math.PI * 2)
-  ctx.stroke()
-  ctx.beginPath()
-  ctx.arc(190, 150, 10, 0, Math.PI * 2)
-  ctx.stroke()
-  ctx.beginPath()
-  ctx.moveTo(130, 185)
-  ctx.lineTo(170, 185)
-  ctx.stroke()
-}
-
-function drawWinkEmotion(ctx: CanvasRenderingContext2D) {
-  ctx.strokeStyle = '#000'
-  ctx.lineWidth = 3
-  ctx.beginPath()
-  ctx.moveTo(100, 150)
-  ctx.lineTo(120, 150)
-  ctx.stroke()
-  ctx.beginPath()
-  ctx.arc(190, 150, 10, 0, Math.PI * 2)
-  ctx.stroke()
-  ctx.beginPath()
-  ctx.arc(150, 180, 25, 0, Math.PI)
+  ctx.arc(150, 200, 18, 0, Math.PI)
   ctx.stroke()
 }
 
@@ -417,18 +250,15 @@ export default function App() {
 
   const drawAvatar = useCallback((ctx: CanvasRenderingContext2D) => {
     const bg = pick(backgrounds)
-    const face = pick(faceTypes)
-    const hair = pick(hairStyles)
-    const hairCol = pick(hairColors)
-    const emo = pick(emotions)
+    const hairColor = pick(hairColors)
     const g = pick(glassesStyles)
     const acc = pick(accessories)
 
     ctx.clearRect(0, 0, 300, 300)
     bg.draw(ctx)
-    face.draw(ctx)
-    hair.draw(ctx, hairCol)
-    emo.draw(ctx)
+    drawProfileFace(ctx)
+    drawHair(ctx, hairColor)
+    drawFaceFeatures(ctx)
     g.draw(ctx)
     acc.draw(ctx)
 
