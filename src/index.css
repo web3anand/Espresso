@@ -14,4 +14,10 @@
   .glass {
     @apply bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-xl;
   }
+  .bg-espresso-radial {
+    background: radial-gradient(circle at top left, rgba(255,255,255,0.05), transparent 70%);
+  }
+  .bg-espresso-vignette {
+    box-shadow: inset 0 0 200px rgba(0,0,0,0.5);
+  }
 }
