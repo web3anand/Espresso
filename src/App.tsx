@@ -1,249 +1,118 @@
 import { useEffect, useRef, useState } from 'react'
+import { Stage, Layer, Line, Image as KImage, Group } from 'react-konva'
+import useImage from 'use-image'
+import type { Stage as KonvaStage } from 'konva'
 
-interface GameState {
-  totalGenerated: number
-  legendaryFound: number
-  currentRarity: string
-}
-
-const gameState: GameState = {
-  totalGenerated: 0,
-  legendaryFound: 0,
-  currentRarity: 'Common',
-}
-
-const avatarComponents = {
-  colors: ['#ef4444', '#60a5fa', '#a855f7', '#facc15'],
-  accessories: ['glasses', 'hat', 'earring'],
+function generateBlobVertices(radius: number, points: number) {
+  const angle = (Math.PI * 2) / points
+  const arr: number[] = []
+  for (let i = 0; i < points; i++) {
+    const r = radius + Math.random() * 40 - 20
+    const x = 175 + r * Math.cos(i * angle)
+    const y = 175 + r * Math.sin(i * angle)
+    arr.push(x, y)
+  }
+  return arr
 }
 
 export default function App() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [blob, setBlob] = useState<number[]>([])
+  const [imageSrc, setImageSrc] = useState('')
+  const [image] = useImage(imageSrc)
   const [twitterUser, setTwitterUser] = useState('')
+  const stageRef = useRef<KonvaStage | null>(null)
 
   useEffect(() => {
-    generatePFP()
-    updateStats()
+    setBlob(generateBlobVertices(200, 8))
   }, [])
 
-  function determineRarity() {
-    const r = Math.random()
-    if (r < 0.01) return 'Legendary'
-    if (r < 0.1) return 'Epic'
-    if (r < 0.3) return 'Rare'
-    return 'Common'
-  }
-
-  function generateAvatarData(forced?: string) {
-    return {
-      color:
-        avatarComponents.colors[
-          Math.floor(Math.random() * avatarComponents.colors.length)
-        ],
-      accessory:
-        avatarComponents.accessories[
-          Math.floor(Math.random() * avatarComponents.accessories.length)
-        ],
-      rarity: forced || determineRarity(),
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (file) {
+      setImageSrc(URL.createObjectURL(file))
     }
   }
 
-  function drawBackground(ctx: CanvasRenderingContext2D, color: string) {
-    ctx.fillStyle = color
-    ctx.fillRect(0, 0, 300, 300)
+  function generateNew() {
+    setBlob(generateBlobVertices(200, 8))
+    setImageSrc('')
   }
 
-  function drawProfileFace(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = '#fff'
-    ctx.beginPath()
-    ctx.arc(150, 150, 100, 0, Math.PI * 2)
-    ctx.fill()
-  }
-
-  function drawAccessory() {}
-
-  function drawLegendaryEffects(ctx: CanvasRenderingContext2D) {
-    ctx.strokeStyle = '#ffd700'
-    ctx.lineWidth = 6
-    ctx.strokeRect(10, 10, 280, 280)
-  }
-
-  function updateRarityBadge(rarity: string) {
-    const badge = document.getElementById('rarityBadge')
-    if (badge) {
-      badge.textContent = rarity
-      badge.className = 'rarity-badge ' + rarity.toLowerCase()
-    }
-  }
-
-  function updateStats() {
-    const total = document.getElementById('totalGenerated')
-    const leg = document.getElementById('legendaryFound')
-    const curr = document.getElementById('currentRarity')
-    if (total) total.textContent = String(gameState.totalGenerated)
-    if (leg) leg.textContent = String(gameState.legendaryFound)
-    if (curr) curr.textContent = gameState.currentRarity
-  }
-
-  function drawAvatar(data: { color: string; rarity: string }) {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D | null
-    if (!ctx) return
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-    drawBackground(ctx, data.color)
-    drawProfileFace(ctx)
-    drawAccessory()
-    if (data.rarity === 'Legendary') drawLegendaryEffects(ctx)
-    updateRarityBadge(data.rarity)
-    gameState.totalGenerated++
-    if (data.rarity === 'Legendary') gameState.legendaryFound++
-    gameState.currentRarity = data.rarity
-  }
-
-  function generatePFP() {
-    const data = generateAvatarData()
-    drawAvatar(data)
-    addToGallery()
-    updateStats()
-  }
-
-  function forceLegendary() {
-    const data = generateAvatarData('Legendary')
-    drawAvatar(data)
-    addToGallery()
-    updateStats()
-  }
-
-  function addToGallery() {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const img = new Image()
-    img.src = canvas.toDataURL('image/png')
-    const gallery = document.getElementById('gallery')
-    if (gallery) gallery.appendChild(img)
-  }
-
-  function showLegendaryModal() {
-    const modal = document.getElementById('shareModal')
-    if (modal) modal.style.display = 'flex'
-  }
-
-  function closeModal() {
-    const modal = document.getElementById('shareModal')
-    if (modal) modal.style.display = 'none'
-  }
-
-  function downloadPFP() {
-    const canvas = canvasRef.current
-    if (!canvas) return
+  function handleDownload() {
+    const uri = stageRef.current?.toDataURL({ pixelRatio: 2 })
+    if (!uri) return
     const link = document.createElement('a')
     link.download = 'avatar.png'
-    link.href = canvas.toDataURL('image/png')
+    link.href = uri
     link.click()
   }
 
   function connectTwitter() {
-    setTwitterUser('anon')
-    const status = document.getElementById('twitterStatus')
-    if (status) status.style.display = 'block'
+    const handle = window.prompt('Enter your Twitter handle')
+    if (handle) setTwitterUser(handle.replace(/^@/, ''))
   }
 
-  function shareToTwitter() {
-    showLegendaryModal()
+  function shareAvatar() {
+    const url = encodeURIComponent(window.location.href)
+    window.open(`https://twitter.com/intent/tweet?url=${url}`, '_blank')
   }
-
-  function copyShareLink() {
-    navigator.clipboard.writeText(window.location.href)
-  }
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if ((e.target as HTMLElement).classList.contains('modal')) {
-        closeModal()
-      }
-    }
-    window.addEventListener('click', handler)
-    return () => window.removeEventListener('click', handler)
-  }, [])
 
   return (
-    <div className="container">
-      <header className="header">
-        <h1>✨ AI Avatar Generator ✨</h1>
-        <p>Generate unique profile pictures with legendary rarity system</p>
-      </header>
-      <div className="main-content">
-        <section className="generator-section">
-          <div className="pfp-display" id="pfpDisplay">
-            <canvas
-              id="pfpCanvas"
-              width={300}
-              height={300}
-              ref={canvasRef}
-            ></canvas>
-            <div id="rarityBadge" className="rarity-badge common">
-              Common
-            </div>
-          </div>
-          <div className="controls">
-            <button className="btn" onClick={generatePFP}>
-              Generate New
-            </button>
-            <button className="btn btn-legendary" onClick={forceLegendary}>
-              Try Legendary
-            </button>
-            <button className="btn" onClick={downloadPFP}>
-              Download
-            </button>
-          </div>
-        </section>
-
-        <section className="generator-section">
-          <button className="btn btn-twitter" onClick={connectTwitter}>
-            Connect Twitter
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 to-blue-800 flex flex-col items-center py-12 px-4">
+      <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl shadow-xl p-6 w-full max-w-md space-y-6">
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="file:bg-indigo-500 file:text-white file:rounded file:px-4 file:py-2 hover:file:bg-indigo-600"
+        />
+        <Stage width={350} height={350} ref={stageRef} className="mx-auto">
+          <Layer>
+            <Line points={blob} closed fill="#8b5cf6" tension={0.5} />
+            {image && (
+              <Group
+                clipFunc={(ctx: CanvasRenderingContext2D) => {
+                  ctx.arc(175, 175, 100, 0, Math.PI * 2, false)
+                }}
+              >
+                <KImage image={image} x={75} y={75} width={200} height={200} />
+              </Group>
+            )}
+          </Layer>
+        </Stage>
+        <div className="flex justify-center gap-2">
+          <button
+            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+            onClick={generateNew}
+          >
+            Generate New
           </button>
-          <div id="twitterStatus">
-            Connected as {twitterUser}
-            <button className="btn" onClick={shareToTwitter}>
-              Share Avatar
+          <button
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+            onClick={handleDownload}
+          >
+            Download
+          </button>
+        </div>
+        <div className="text-center">
+          {!twitterUser ? (
+            <button
+              onClick={connectTwitter}
+              className="bg-blue-400 hover:bg-blue-500 text-white px-4 py-2 rounded"
+            >
+              Connect Twitter
             </button>
-          </div>
-        </section>
-
-        <section className="generator-section">
-          <div className="controls">
-            <span className="rarity-badge common">Common 69%</span>
-            <span className="rarity-badge rare">Rare 20%</span>
-            <span className="rarity-badge epic">Epic 10%</span>
-            <span className="rarity-badge legendary">Legendary 1%</span>
-          </div>
-        </section>
-
-        <section className="stats-section">
-          <div>
-            Total Generated: <span id="totalGenerated">0</span>
-          </div>
-          <div>
-            Legendary Found: <span id="legendaryFound">0</span>
-          </div>
-          <div>
-            Current Rarity: <span id="currentRarity">Common</span>
-          </div>
-        </section>
-
-        <div className="gallery" id="gallery"></div>
-
-        <div id="shareModal" className="modal">
-          <div className="modal-content">
-            <span className="close" onClick={closeModal}>
-              &times;
-            </span>
-            <p>Share this avatar on Twitter!</p>
-            <button className="btn" onClick={copyShareLink}>
-              Copy Link
-            </button>
-          </div>
+          ) : (
+            <div className="space-y-2">
+              <div>Connected as @{twitterUser}</div>
+              <button
+                onClick={shareAvatar}
+                className="bg-blue-400 hover:bg-blue-500 text-white px-4 py-2 rounded"
+              >
+                Share Avatar
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
