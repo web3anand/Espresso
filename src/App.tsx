@@ -91,7 +91,7 @@ export default function App() {
   function drawAvatar(data: { color: string; rarity: string }) {
     const canvas = canvasRef.current
     if (!canvas) return
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D | null
     if (!ctx) return
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     drawBackground(ctx, data.color)
