@@ -61,9 +61,9 @@ export default function App() {
     ctx.fill()
   }
 
-  function drawAccessory(_ctx: CanvasRenderingContext2D) {}
-  function drawBrainPattern(_ctx: CanvasRenderingContext2D) {}
-  function drawTechAccessory(_ctx: CanvasRenderingContext2D) {}
+  function drawAccessory(ctx: CanvasRenderingContext2D) {}
+  function drawBrainPattern(ctx: CanvasRenderingContext2D) {}
+  function drawTechAccessory(ctx: CanvasRenderingContext2D) {}
 
   function drawLegendaryEffects(ctx: CanvasRenderingContext2D) {
     ctx.strokeStyle = '#ffd700'
