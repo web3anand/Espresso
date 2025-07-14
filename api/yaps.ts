@@ -12,7 +12,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const data = await response.json();
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.status(response.status).json(data);
-  } catch (err: any) {
+  } catch (err: unknown) {
     // Log error for debugging in Vercel dashboard
     console.error('API error:', err);
     res.status(500).json({ error: String(err) });
