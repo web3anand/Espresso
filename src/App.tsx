@@ -1,64 +1,251 @@
-import { useState, type FormEvent } from 'react';
-import SearchGlass from './components/SearchGlass';
-import MetricsCard from './components/MetricsCard';
-import BackgroundBlobs from './components/BackgroundBlobs';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import type { KaitoYapData } from '../api/kaito';
+import { useEffect, useRef, useState } from 'react'
 
-async function fetchYaps(username: string): Promise<KaitoYapData> {
-  const res = await fetch(`/api/yaps?username=${encodeURIComponent(username.trim())}`);
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || 'Failed to fetch data');
-  }
-  return (await res.json()) as KaitoYapData;
+interface GameState {
+  totalGenerated: number
+  legendaryFound: number
+  currentRarity: string
+}
+
+const gameState: GameState = {
+  totalGenerated: 0,
+  legendaryFound: 0,
+  currentRarity: 'Common',
+}
+
+const avatarComponents = {
+  colors: ['#ef4444', '#60a5fa', '#a855f7', '#facc15'],
+  accessories: ['glasses', 'hat', 'earring'],
 }
 
 export default function App() {
-  const [username, setUsername] = useState('');
-  const [data, setData] = useState<KaitoYapData | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [twitterUser, setTwitterUser] = useState('')
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const name = username.trim();
-    if (!name) return;
-    setLoading(true);
-    setError('');
-    try {
-      const res = await fetchYaps(name);
-      setData(res);
-    } catch (err: any) {
-      setError(err.message || 'User not found');
-      setData(null);
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    generatePFP()
+    updateStats()
+  }, [])
+
+  function determineRarity() {
+    const r = Math.random()
+    if (r < 0.01) return 'Legendary'
+    if (r < 0.1) return 'Epic'
+    if (r < 0.3) return 'Rare'
+    return 'Common'
+  }
+
+  function generateAvatarData(forced?: string) {
+    return {
+      color:
+        avatarComponents.colors[
+          Math.floor(Math.random() * avatarComponents.colors.length)
+        ],
+      accessory:
+        avatarComponents.accessories[
+          Math.floor(Math.random() * avatarComponents.accessories.length)
+        ],
+      rarity: forced || determineRarity(),
     }
   }
 
+  function drawBackground(ctx: CanvasRenderingContext2D, color: string) {
+    ctx.fillStyle = color
+    ctx.fillRect(0, 0, 300, 300)
+  }
+
+  function drawProfileFace(ctx: CanvasRenderingContext2D) {
+    ctx.fillStyle = '#fff'
+    ctx.beginPath()
+    ctx.arc(150, 150, 100, 0, Math.PI * 2)
+    ctx.fill()
+  }
+
+  function drawAccessory() {}
+
+  function drawLegendaryEffects(ctx: CanvasRenderingContext2D) {
+    ctx.strokeStyle = '#ffd700'
+    ctx.lineWidth = 6
+    ctx.strokeRect(10, 10, 280, 280)
+  }
+
+  function updateRarityBadge(rarity: string) {
+    const badge = document.getElementById('rarityBadge')
+    if (badge) {
+      badge.textContent = rarity
+      badge.className = 'rarity-badge ' + rarity.toLowerCase()
+    }
+  }
+
+  function updateStats() {
+    const total = document.getElementById('totalGenerated')
+    const leg = document.getElementById('legendaryFound')
+    const curr = document.getElementById('currentRarity')
+    if (total) total.textContent = String(gameState.totalGenerated)
+    if (leg) leg.textContent = String(gameState.legendaryFound)
+    if (curr) curr.textContent = gameState.currentRarity
+  }
+
+  function drawAvatar(data: { color: string; rarity: string }) {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D | null
+    if (!ctx) return
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    drawBackground(ctx, data.color)
+    drawProfileFace(ctx)
+    drawAccessory()
+    if (data.rarity === 'Legendary') drawLegendaryEffects(ctx)
+    updateRarityBadge(data.rarity)
+    gameState.totalGenerated++
+    if (data.rarity === 'Legendary') gameState.legendaryFound++
+    gameState.currentRarity = data.rarity
+  }
+
+  function generatePFP() {
+    const data = generateAvatarData()
+    drawAvatar(data)
+    addToGallery()
+    updateStats()
+  }
+
+  function forceLegendary() {
+    const data = generateAvatarData('Legendary')
+    drawAvatar(data)
+    addToGallery()
+    updateStats()
+  }
+
+  function addToGallery() {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const img = new Image()
+    img.src = canvas.toDataURL('image/png')
+    const gallery = document.getElementById('gallery')
+    if (gallery) gallery.appendChild(img)
+  }
+
+  function showLegendaryModal() {
+    const modal = document.getElementById('shareModal')
+    if (modal) modal.style.display = 'flex'
+  }
+
+  function closeModal() {
+    const modal = document.getElementById('shareModal')
+    if (modal) modal.style.display = 'none'
+  }
+
+  function downloadPFP() {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const link = document.createElement('a')
+    link.download = 'avatar.png'
+    link.href = canvas.toDataURL('image/png')
+    link.click()
+  }
+
+  function connectTwitter() {
+    setTwitterUser('anon')
+    const status = document.getElementById('twitterStatus')
+    if (status) status.style.display = 'block'
+  }
+
+  function shareToTwitter() {
+    showLegendaryModal()
+  }
+
+  function copyShareLink() {
+    navigator.clipboard.writeText(window.location.href)
+  }
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if ((e.target as HTMLElement).classList.contains('modal')) {
+        closeModal()
+      }
+    }
+    window.addEventListener('click', handler)
+    return () => window.removeEventListener('click', handler)
+  }, [])
+
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      <main className="relative flex flex-col items-center justify-center flex-1 text-center px-4">
-        <BackgroundBlobs />
-        <h1 className="text-6xl md:text-8xl font-extrabold text-white drop-shadow-lg">
-          Espresso Yaps Analytics
-        </h1>
-        <p className="text-lg text-gray-300 mt-4">Tokenized attention for X at a glance</p>
-        <div className="mt-8 w-full flex justify-center">
-          <SearchGlass
-            value={username}
-            onChange={setUsername}
-            onSubmit={handleSubmit}
-            loading={loading}
-          />
+    <div className="container">
+      <header className="header">
+        <h1>✨ AI Avatar Generator ✨</h1>
+        <p>Generate unique profile pictures with legendary rarity system</p>
+      </header>
+      <div className="main-content">
+        <section className="generator-section">
+          <div className="pfp-display" id="pfpDisplay">
+            <canvas
+              id="pfpCanvas"
+              width={300}
+              height={300}
+              ref={canvasRef}
+            ></canvas>
+            <div id="rarityBadge" className="rarity-badge common">
+              Common
+            </div>
+          </div>
+          <div className="controls">
+            <button className="btn" onClick={generatePFP}>
+              Generate New
+            </button>
+            <button className="btn btn-legendary" onClick={forceLegendary}>
+              Try Legendary
+            </button>
+            <button className="btn" onClick={downloadPFP}>
+              Download
+            </button>
+          </div>
+        </section>
+
+        <section className="generator-section">
+          <button className="btn btn-twitter" onClick={connectTwitter}>
+            Connect Twitter
+          </button>
+          <div id="twitterStatus">
+            Connected as {twitterUser}
+            <button className="btn" onClick={shareToTwitter}>
+              Share Avatar
+            </button>
+          </div>
+        </section>
+
+        <section className="generator-section">
+          <div className="controls">
+            <span className="rarity-badge common">Common 69%</span>
+            <span className="rarity-badge rare">Rare 20%</span>
+            <span className="rarity-badge epic">Epic 10%</span>
+            <span className="rarity-badge legendary">Legendary 1%</span>
+          </div>
+        </section>
+
+        <section className="stats-section">
+          <div>
+            Total Generated: <span id="totalGenerated">0</span>
+          </div>
+          <div>
+            Legendary Found: <span id="legendaryFound">0</span>
+          </div>
+          <div>
+            Current Rarity: <span id="currentRarity">Common</span>
+          </div>
+        </section>
+
+        <div className="gallery" id="gallery"></div>
+
+        <div id="shareModal" className="modal">
+          <div className="modal-content">
+            <span className="close" onClick={closeModal}>
+              &times;
+            </span>
+            <p>Share this avatar on Twitter!</p>
+            <button className="btn" onClick={copyShareLink}>
+              Copy Link
+            </button>
+          </div>
         </div>
-        {error && <p className="text-red-500 mt-4">{error}</p>}
-        {data && <MetricsCard data={data} />}
-      </main>
-      <Footer />
+      </div>
     </div>
-  );
+  )
 }
