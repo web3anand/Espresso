@@ -73,7 +73,7 @@ export default function App() {
             <Line points={blob} closed fill="#8b5cf6" tension={0.5} />
             {image && (
               <Group
-                clipFunc={(ctx) => {
+                clipFunc={(ctx: CanvasRenderingContext2D) => {
                   ctx.arc(175, 175, 100, 0, Math.PI * 2, false)
                 }}
               >
