@@ -168,7 +168,7 @@ export default function App() {
   }, [])
 
   return (
-    <div className="container">
+    <div className="container min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
       <header className="header">
         <h1>✨ AI Avatar Generator ✨</h1>
         <p>Generate unique profile pictures with legendary rarity system</p>
