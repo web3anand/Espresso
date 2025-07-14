@@ -1,18 +1,20 @@
-import { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 
 export default function App() {
-  const [imageSrc, setImageSrc] = useState('');
-  const canvasRef = useRef(null);
+  const [imageSrc, setImageSrc] = useState<string>('');
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  function handleFile(e) {
+  function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => setImageSrc(reader.result.toString());
+    reader.onload = () => {
+      if (reader.result) setImageSrc(String(reader.result));
+    };
     reader.readAsDataURL(file);
   }
 
-  function handleSample(e) {
+  function handleSample(e: React.ChangeEvent<HTMLSelectElement>) {
     const sample = e.target.value;
     if (sample) setImageSrc(sample);
   }
@@ -21,6 +23,7 @@ export default function App() {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
+    if (!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // draw espresso-style blobs
@@ -54,7 +57,7 @@ export default function App() {
 
   useEffect(draw, [imageSrc]);
 
-  function download() {
+  function download(): void {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const link = document.createElement('a');
