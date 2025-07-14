@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,12 +6,6 @@
 
 @layer base {
   body {
-    @apply min-h-screen bg-gradient-to-b from-black via-gray-900 to-black font-sans text-white;
-  }
-}
-
-@layer utilities {
-  .glass {
-    @apply bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-xl;
+    @apply font-sans bg-gray-100 text-gray-900;
   }
 }
