@@ -1,4 +1,9 @@
 {
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "allowJs": true,
+    "checkJs": false
+  },
   "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },
