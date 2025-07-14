@@ -1,17 +1,33 @@
+/* Import Inter font used in the Tailwind sans stack */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap');
 
+/* Tailwind layer directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ----- Base styles ----- */
 @layer base {
   body {
-    @apply min-h-screen bg-gradient-to-b from-black via-gray-900 to-black font-sans text-white;
+    /* Full viewport height with a subtle dark gradient */
+    @apply min-h-screen font-sans text-white bg-gradient-to-b from-black via-gray-900 to-black;
   }
 }
 
+/* ----- Custom utilities ----- */
 @layer utilities {
+  /* Frosted glass effect wrapper */
   .glass {
-    @apply bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-xl;
+    @apply border border-white/20 bg-white/10 backdrop-blur-xl rounded-3xl shadow-xl;
+  }
+
+  /* Radial highlight at the top-left corner */
+  .bg-espresso-radial {
+    background-image: radial-gradient(circle at top left, rgba(255 255 255 / 0.05), transparent 70%);
+  }
+
+  /* Soft vignette around the page edges */
+  .bg-espresso-vignette {
+    box-shadow: inset 0 0 200px rgba(0 0 0 / 0.5);
   }
 }

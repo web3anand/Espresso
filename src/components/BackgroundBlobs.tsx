@@ -1,8 +1,28 @@
 export default function BackgroundBlobs() {
   return (
-    <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-      <div className="absolute left-1/2 top-0 h-[50vh] w-[50vh] -translate-x-1/2 rounded-full bg-indigo-700 opacity-30 blur-3xl animate-pulse" />
-      <div className="absolute right-1/3 bottom-0 h-[40vh] w-[40vh] rounded-full bg-pink-500 opacity-20 blur-3xl animate-pulse" />
-    </div>
+    <>
+      <svg
+        className="absolute -top-16 -left-16 w-72 h-72 opacity-20 blur-3xl pointer-events-none"
+        viewBox="0 0 200 200"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          fill="#4F46E5"
+          d="M39.5,-65.2C51.7,-56.5,63.3,-51.2,69.5,-41.3C75.8,-31.5,76.7,-17,75,-3.3C73.4,10.3,69.1,20.6,63.4,31.4C57.7,42.3,50.5,53.8,40.4,61.7C30.3,69.5,17.1,73.7,3,70.1C-11.2,66.5,-22.4,55.1,-32.9,45.1C-43.4,35.2,-53.2,26.6,-58.1,15.1C-63.1,3.7,-63.3,-10.6,-59.9,-23C-56.5,-35.3,-49.5,-45.7,-40,-54.1C-30.5,-62.5,-15.3,-68.8,-0.5,-68.2C14.3,-67.6,28.6,-60,39.5,-65.2Z"
+          transform="translate(100 100)"
+        />
+      </svg>
+      <svg
+        className="absolute bottom-0 right-0 w-96 h-96 opacity-15 blur-2xl pointer-events-none"
+        viewBox="0 0 200 200"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          fill="#EC4899"
+          d="M34.4,-61.1C45.8,-54.5,56.1,-45.6,60.9,-34.5C65.7,-23.4,65.1,-10.2,63.2,3.6C61.3,17.5,58.1,32.1,50,44.9C41.9,57.7,28.9,68.6,13.1,75.1C-2.7,81.6,-20.3,83.8,-32.6,77.7C-44.8,71.5,-51.7,56.9,-59.6,42.9C-67.5,28.9,-76.5,15.4,-78.2,1.6C-79.8,-12.2,-74.2,-26.4,-66.4,-39.2C-58.6,-51.9,-48.7,-63.2,-36.3,-70.9C-23.8,-78.5,-11.9,-82.5,0.2,-82.8C12.2,-83.1,24.4,-79.7,34.4,-61.1Z"
+          transform="translate(100 100)"
+        />
+      </svg>
+    </>
   );
 }
