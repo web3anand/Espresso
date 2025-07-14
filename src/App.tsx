@@ -91,10 +91,14 @@ function drawCrystalBg(ctx: CanvasRenderingContext2D) {
 function drawProfileFace(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = '#ffe0bd'
   ctx.beginPath()
-  ctx.moveTo(150, 70)
-  ctx.bezierCurveTo(100, 70, 90, 150, 110, 210)
-  ctx.quadraticCurveTo(150, 230, 190, 210)
-  ctx.bezierCurveTo(210, 150, 200, 70, 150, 70)
+  ctx.moveTo(120, 220)
+  ctx.quadraticCurveTo(130, 180, 120, 130)
+  ctx.quadraticCurveTo(130, 60, 180, 60)
+  ctx.quadraticCurveTo(210, 70, 210, 120)
+  ctx.quadraticCurveTo(220, 145, 210, 160)
+  ctx.quadraticCurveTo(205, 170, 190, 172)
+  ctx.quadraticCurveTo(170, 175, 170, 190)
+  ctx.quadraticCurveTo(150, 200, 120, 220)
   ctx.closePath()
   ctx.fill()
 }
@@ -102,10 +106,12 @@ function drawProfileFace(ctx: CanvasRenderingContext2D) {
 function drawHair(ctx: CanvasRenderingContext2D, color: string) {
   ctx.fillStyle = color
   ctx.beginPath()
-  ctx.moveTo(60, 80)
-  ctx.bezierCurveTo(90, 20, 210, 20, 240, 80)
-  ctx.lineTo(240, 120)
-  ctx.bezierCurveTo(200, 80, 100, 80, 60, 120)
+  ctx.moveTo(115, 80)
+  ctx.quadraticCurveTo(120, 30, 180, 30)
+  ctx.quadraticCurveTo(220, 40, 230, 80)
+  ctx.lineTo(210, 120)
+  ctx.quadraticCurveTo(200, 70, 150, 60)
+  ctx.quadraticCurveTo(130, 60, 115, 80)
   ctx.closePath()
   ctx.fill()
 }
@@ -113,38 +119,35 @@ function drawHair(ctx: CanvasRenderingContext2D, color: string) {
 function drawFaceFeatures(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = '#000'
   ctx.beginPath()
-  ctx.arc(125, 150, 6, 0, Math.PI * 2)
-  ctx.arc(175, 150, 6, 0, Math.PI * 2)
+  ctx.arc(190, 120, 8, 0, Math.PI * 2)
   ctx.fill()
   ctx.beginPath()
-  ctx.moveTo(150, 160)
-  ctx.lineTo(150, 180)
+  ctx.moveTo(210, 120)
+  ctx.quadraticCurveTo(215, 135, 210, 150)
   ctx.strokeStyle = '#000'
   ctx.lineWidth = 2
   ctx.stroke()
   ctx.beginPath()
-  ctx.arc(150, 200, 18, 0, Math.PI)
+  ctx.arc(150, 150, 12, Math.PI * 0.5, Math.PI * 1.5)
   ctx.stroke()
 }
 
 function drawPixelGlasses(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = '#333'
-  ctx.fillRect(90, 130, 40, 20)
-  ctx.fillRect(170, 130, 40, 20)
-  ctx.fillRect(130, 135, 40, 10)
+  ctx.fillRect(175, 110, 30, 18)
+  ctx.fillRect(205, 114, 18, 6)
   ctx.fillStyle = '#fff'
-  ctx.fillRect(92, 132, 16, 16)
-  ctx.fillRect(172, 132, 16, 16)
+  ctx.fillRect(177, 112, 14, 14)
 }
 
 function drawVisorGlasses(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = '#000'
-  ctx.fillRect(90, 130, 120, 20)
+  ctx.fillRect(170, 112, 50, 16)
   ctx.strokeStyle = '#FF1493'
   ctx.lineWidth = 4
   ctx.beginPath()
-  ctx.moveTo(90, 130)
-  ctx.lineTo(210, 130)
+  ctx.moveTo(170, 112)
+  ctx.lineTo(220, 112)
   ctx.stroke()
 }
 
@@ -152,17 +155,16 @@ function drawRoundGlasses(ctx: CanvasRenderingContext2D) {
   ctx.strokeStyle = '#222'
   ctx.lineWidth = 4
   ctx.beginPath()
-  ctx.arc(120, 140, 20, 0, Math.PI * 2)
-  ctx.arc(180, 140, 20, 0, Math.PI * 2)
+  ctx.arc(190, 120, 18, 0, Math.PI * 2)
   ctx.stroke()
   ctx.beginPath()
-  ctx.moveTo(140, 140)
-  ctx.lineTo(160, 140)
+  ctx.moveTo(208, 120)
+  ctx.lineTo(226, 120)
   ctx.stroke()
   ctx.strokeStyle = '#20B2AA'
   ctx.beginPath()
-  ctx.moveTo(200, 140)
-  ctx.lineTo(210, 140)
+  ctx.moveTo(208, 120)
+  ctx.lineTo(226, 120)
   ctx.stroke()
 }
 
@@ -170,78 +172,74 @@ function drawAviatorGlasses(ctx: CanvasRenderingContext2D) {
   ctx.strokeStyle = '#222'
   ctx.lineWidth = 4
   ctx.beginPath()
-  ctx.moveTo(100, 130)
-  ctx.bezierCurveTo(120, 120, 140, 120, 160, 130)
-  ctx.bezierCurveTo(140, 160, 120, 160, 100, 130)
-  ctx.moveTo(200, 130)
-  ctx.bezierCurveTo(180, 120, 160, 120, 140, 130)
-  ctx.bezierCurveTo(160, 160, 180, 160, 200, 130)
+  ctx.moveTo(170, 116)
+  ctx.bezierCurveTo(185, 108, 205, 108, 218, 116)
+  ctx.bezierCurveTo(205, 140, 185, 140, 170, 116)
   ctx.stroke()
   ctx.beginPath()
-  ctx.moveTo(140, 140)
-  ctx.lineTo(160, 140)
+  ctx.moveTo(188, 120)
+  ctx.lineTo(206, 120)
   ctx.stroke()
 }
 
 function drawFuturisticGlasses(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = '#0ff'
-  ctx.fillRect(90, 135, 120, 15)
+  ctx.fillRect(170, 116, 50, 12)
   ctx.fillStyle = '#000'
-  ctx.fillRect(90, 132, 5, 20)
-  ctx.fillRect(205, 132, 5, 20)
+  ctx.fillRect(170, 114, 6, 16)
+  ctx.fillRect(214, 114, 6, 16)
 }
 
 function drawEarring(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = '#FFD700'
   ctx.beginPath()
-  ctx.arc(220, 170, 5, 0, Math.PI * 2)
+  ctx.arc(158, 150, 4, 0, Math.PI * 2)
   ctx.fill()
 }
 
 function drawCrown(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = '#C0C0C0'
   ctx.beginPath()
-  ctx.moveTo(120, 80)
-  ctx.lineTo(150, 40)
-  ctx.lineTo(180, 80)
+  ctx.moveTo(140, 40)
+  ctx.lineTo(170, 20)
+  ctx.lineTo(200, 40)
   ctx.closePath()
   ctx.fill()
 }
 
 function drawHairPin(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = '#FFD700'
-  ctx.fillRect(190, 100, 4, 30)
+  ctx.fillRect(200, 90, 4, 30)
 }
 
 function drawHeadphones(ctx: CanvasRenderingContext2D) {
   ctx.strokeStyle = '#555'
   ctx.lineWidth = 8
   ctx.beginPath()
-  ctx.arc(150, 120, 90, Math.PI * 1.2, Math.PI * 1.8)
+  ctx.arc(150, 120, 90, Math.PI * 1.3, Math.PI * 1.9)
   ctx.stroke()
   ctx.fillStyle = '#000'
   ctx.fillRect(60, 120, 20, 40)
-  ctx.fillRect(220, 120, 20, 40)
 }
 
 function drawCigar(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = '#8B4513'
-  ctx.fillRect(170, 180, 40, 8)
+  ctx.fillRect(200, 160, 40, 6)
   ctx.fillStyle = '#f00'
-  ctx.fillRect(210, 180, 6, 8)
+  ctx.fillRect(240, 160, 6, 6)
 }
 
 function drawNecklace(ctx: CanvasRenderingContext2D) {
   ctx.strokeStyle = '#FFD700'
   ctx.lineWidth = 4
   ctx.beginPath()
-  ctx.arc(150, 220, 40, 0, Math.PI)
+  ctx.arc(140, 220, 40, Math.PI * 0.1, Math.PI * 0.9)
   ctx.stroke()
 }
 
 function drawMask(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = '#ccc'
-  ctx.fillRect(110, 160, 80, 30)
+  ctx.fillRect(160, 140, 60, 40)
 }
 
 export default function App() {
