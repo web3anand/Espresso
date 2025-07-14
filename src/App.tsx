@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Stage, Layer, Line, Image as KImage, Group } from 'react-konva'
+import useImage from 'use-image'
+import type { Stage as KonvaStage } from 'konva'
 
 function generateBlobVertices(radius: number, points: number) {
   const angle = (Math.PI * 2) / points
@@ -15,9 +17,10 @@ function generateBlobVertices(radius: number, points: number) {
 
 export default function App() {
   const [blob, setBlob] = useState<number[]>([])
-  const [image, setImage] = useState<HTMLImageElement | null>(null)
+  const [imageSrc, setImageSrc] = useState('')
+  const [image] = useImage(imageSrc)
   const [twitterUser, setTwitterUser] = useState('')
-  const stageRef = useRef<any>(null)
+  const stageRef = useRef<KonvaStage | null>(null)
 
   useEffect(() => {
     setBlob(generateBlobVertices(200, 8))
@@ -25,19 +28,14 @@ export default function App() {
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = () => {
-      const img = new Image()
-      img.src = reader.result as string
-      img.onload = () => setImage(img)
+    if (file) {
+      setImageSrc(URL.createObjectURL(file))
     }
-    reader.readAsDataURL(file)
   }
 
   function generateNew() {
     setBlob(generateBlobVertices(200, 8))
-    setImage(null)
+    setImageSrc('')
   }
 
   function handleDownload() {
